@@ -37,6 +37,7 @@ trial_types = [['gR','rR','bR','yR'],['gW','rW','bW','yW'],
 '''
 add block of colored/uncolored but only respond to word content?
 add time piece to instructions
+implement practice
 '''
 n_scrambles = 1
 blockNumber = 0
