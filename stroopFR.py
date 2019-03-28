@@ -39,7 +39,7 @@ add block of colored/uncolored but only respond to word content?
 add time piece to instructions
 implement practice
 '''
-n_scrambles = 1
+n_scrambles = 2
 blockNumber = 0
 repNums = [100,102,106,107]
 repKeys = ['D','F','J','K']
@@ -61,16 +61,21 @@ instructions = {}
 
 rectInstr = """Vous verrez des rectangles sur l'ecran.\n Si le couleur du rectangle est:
 %s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n
-Appuyez sur ESPACE pour commencer."""%keyAssign
+Appuyez sur ESPACE pour continuer."""%keyAssign
+
+timeInstr = """Vous avez un temps limite pour chaque item.
+Essayez de repondre aussi vite et correctement que possible.
+Si vous ne repondez pas assez rapidement, vous allez avancer a la suivante.
+Appuyez sur ESPACE pour essayer."""
 
 txtInstr = """Vous verrez des mots sur l'ecran.\n Si le mot est:
 %s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n
-Appuyez sur ESPACE pour commencer."""%keyAssign
+Appuyez sur ESPACE pour continuer."""%keyAssign
 
 cTxtInstr = """Vous verrez des mots en couleur sur l'ecran.\n 
 Si le COULEUR DU MOT est:
 %s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n
-Appuyez sur ESPACE pour commencer."""%keyAssign
+Appuyez sur ESPACE pour continuer."""%keyAssign
 
 switchInstr = """Vous verrez une melange de tous les types anterieurs sur l'ecran.
 Pour les rectangles, repondez selon le couleur.
@@ -80,6 +85,13 @@ Appuyez sur ESPACE pour continuer."""
 
 rappelInstr = """Rappelez:\n %s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n\n 
 Appuyez sur ESPACE pour commencer."""%keyAssign
+
+sendOff = """Tres bien!\n\n 
+Appuyez sur ESPACE pour commencer."""
+
+retryTxt = """Pas exactement. Rappelez:
+%s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n\n 
+Appuyez sur ESPACE pour ressayer."""%keyAssign
 
 instr = [rectInstr, txtInstr, cTxtInstr, switchInstr,rappelInstr]
 
@@ -139,10 +151,23 @@ def clrTrial(trial_name, block_name):
 	trial_name.set_factor(name = "Letter", value = Vars[clrName][3])
 	block_name.add_trial(trial_name)
 	
-def addBlock(block):
+'''
+practice block
+draw 5 trials
+identify correct responses
+if < 4 correct, try again
+
+'''
+
+def addBlock(block, prac = bool):
 	blockNum = block
+	if prac == True:
+		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],2)
+		trials = rnd.choices(trials,k=5)
+		block = ''.join([str(blockNum),' Practice'])
+	else:
+		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],n_scrambles)
 	block = xpy.design.Block(name = block)
-	trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],n_scrambles)
 	for trial in trials:
 		if trial[1] == 'R':
 			rectTrial(trial,block)
@@ -151,19 +176,6 @@ def addBlock(block):
 		else:
 			clrTrial(trial,block)
 	exp.add_block(block)
-
-#def addPracBlock(block):
-#	blockNum = block
-#	block = xpy.design.Block(name = block)
-#	trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],1)
-#	for trial in trials:
-#		if trial[1] == 'R':
-#			rectTrial(trial,block)
-#		elif trial[1] == 'W':
-#			bwTrial(trial,block)
-#		else:
-#			clrTrial(trial,block)
-#	exp.add_block(block)
 
 for Idx, key in enumerate(repKeys):
 	repKeyVars[Idx] = xpy.stimuli.TextBox(repKeys[Idx], size = (side,side),text_colour = xpy.misc.constants.C_BLACK, 
@@ -178,7 +190,6 @@ def keyPresent():
 	
 blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2,"IntroSwitch",3]
 instrNum = 0
-#expBlkNum = 0
 
 for blck in blockNames:
 	if type(blck) == str:
@@ -187,7 +198,114 @@ for blck in blockNames:
 		exp.add_block(Block)
 		instrNum += 1
 	elif type(blck) == int:
+		addBlock(blck,prac = 1)
 		addBlock(blck)
+
+def presentInstr(blockNum):
+	for block in exp.blocks[blockNum:blockNum + 1]:
+		for trial in block.trials:
+			trial.stimuli[0].present(clear = True, update = True)
+			exp.keyboard.wait(xpy.misc.constants.K_SPACE)
+			
+def presentBlock(blockNum,prac = int):
+	ready = False
+	while ready == False:
+		err = 0
+		for block in exp.blocks[blockNum:blockNum + 1]:
+			for trial in block.trials:
+				keyPresent()
+				cross.present(clear = False, update = True)
+				exp.clock.wait(rnd.randint(500,1000))
+				keyPresent()
+				trial.stimuli[0].present(clear = False, update= True)
+				key, rt = exp.keyboard.wait([xpy.misc.constants.K_d,
+		                                     xpy.misc.constants.K_f,
+											  xpy.misc.constants.K_j,
+											  xpy.misc.constants.K_k],
+											duration = 1500)
+				exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
+						trial.get_factor("Color"), trial.get_factor("Text") ,
+						trial.get_factor("Letter"), key, rt])
+				if key != trial.get_factor("Letter"):
+					err += 1
+				blank.present(clear = True, update= False)
+				keyPresent()
+				repKeyVars[3].present(clear = False,update = True)
+				exp.clock.wait(500)
+		if prac != 1:
+			ready = True
+		elif err < 3 and prac == 1:
+			ready = True
+			sendoff.present()
+			exp.keyboard.wait(xpy.misc.constants.K_SPACE)
+		else:
+			retry.present()
+			exp.keyboard.wait(xpy.misc.constants.K_SPACE)
+		
+	
+cross = xpy.stimuli.FixCross((25,25),(0,0),4)
+cross.preload()
+
+blank = xpy.stimuli.BlankScreen()
+blank.preload()
+
+sendoff = xpy.stimuli.TextBox(sendOff,(750,300),(0,-100))
+sendoff.preload()
+retry = xpy.stimuli.TextBox(retryTxt,(750,300),(0,-100))
+retry.preload()
+
+exp.data_variable_names = ["Block", "Trial", "Type", "Color", "Text", "Letter", "Key", "RT"]
+
+xpy.control.start(skip_ready_screen = True)
+blNum = 0
+for i in range(0,4):
+	presentInstr(blNum)
+	blNum += 1
+	presentBlock(blNum,prac = 1)
+	blNum += 1
+	presentBlock(blNum)
+	blNum += 1
+
+xpy.control.end()
+#%%
+
+#def addPracBlock(block):
+#	blockNum = block
+#	block = xpy.design.Block(name = block)
+#	trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],1)
+#	for trial in trials:
+#		if trial[1] == 'R':
+#			rectTrial(trial,block)
+#		elif trial[1] == 'W':
+#			bwTrial(trial,block)
+#		else:
+#			clrTrial(trial,block)
+#	exp.add_block(block)
+
+#def presentBlock(block_start,block_stop):
+#	for block in exp.blocks[block_start:block_stop]:
+#		cross.present()
+#		for trial in block.trials:
+#			keyPresent()
+#			cross.present(clear = False, update = True)
+#			exp.clock.wait(rnd.randint(500,1000))
+#			keyPresent()
+#			trial.stimuli[0].present(clear = False, update= True)
+#			key, rt = exp.keyboard.wait([xpy.misc.constants.K_d,
+#	                                     xpy.misc.constants.K_f,
+#										  xpy.misc.constants.K_j,
+#										  xpy.misc.constants.K_k],
+#										duration = 1500)
+#			exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
+#					trial.get_factor("Color"), trial.get_factor("Text") ,
+#					trial.get_factor("Letter"), key, rt])
+#			blank.present(clear = True, update= False)
+#			keyPresent()
+#			repKeyVars[3].present(clear = False,update = True)
+#			exp.clock.wait(500)
+
+
+
 	
 #introRect = xpy.design.Block(name = "IntroRect")
 #instrTrial(instr[0],introRect)
@@ -218,66 +336,3 @@ for blck in blockNames:
 #
 #addBlock(blockNumber)
 #blockNumber += 1
-def presentInstr(block_start,block_stop):
-	for block in exp.blocks[block_start:block_stop]:
-		for trial in block.trials:
-			trial.stimuli[0].present(clear = True, update = True)
-			exp.keyboard.wait(xpy.misc.constants.K_SPACE)
-			
-def presentBlock(block_start,block_stop):
-	for block in exp.blocks[block_start:block_stop]:
-		cross.present()
-		for trial in block.trials:
-			keyPresent()
-			cross.present(clear = False, update = True)
-			exp.clock.wait(rnd.randint(500,1000))
-			keyPresent()
-			trial.stimuli[0].present(clear = False, update= True)
-			key, rt = exp.keyboard.wait([xpy.misc.constants.K_d,
-	                                     xpy.misc.constants.K_f,
-										  xpy.misc.constants.K_j,
-										  xpy.misc.constants.K_k],
-										duration = 1500)
-			exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
-					trial.get_factor("Color"), trial.get_factor("Text") ,
-					trial.get_factor("Letter"), key, rt])
-			blank.present(clear = True, update= False)
-			keyPresent()
-			repKeyVars[3].present(clear = False,update = True)
-			exp.clock.wait(500)
-	
-cross = xpy.stimuli.FixCross((25,25),(0,0),4)
-cross.preload()
-
-blank = xpy.stimuli.BlankScreen()
-blank.preload()
-
-exp.data_variable_names = ["Block", "Trial", "Type", "Color", "Text", "Letter", "Key", "RT"]
-
-xpy.control.start(skip_ready_screen = True)
-blNum = 0
-for i in range(0,4):
-	ready = False
-	presentInstr(blNum,blNum + 1)
-	blNum += 1
-#	while ready == False:
-#		keys = []
-#		for block in exp.blocks[blNum,blNum + 1]:
-#			for trial in block.trials:
-#				cross.present()
-#				exp.clock.wait(1000)
-#				cross.present(update = False)
-	#			trial.stimuli[0].present(clear = False, update = True)
-	#			key, rt = exp.keyboard.wait([xpy.misc.constants.K_LEFT,
-	#	                                     xpy.misc.constants.K_RIGHT])
-	#			keys.append(key)
-	#			exp.data.add([block.name, trial.id, trial.get_factor("position"),key, rt])
-	#	if keys == [275,276,275,276]:
-	#		ready = True
-	#	else:
-	#		present_instr(2,3)
-	#present_instr(3,4)	
-	presentBlock(blNum,blNum + 1)
-	blNum += 1
-
-xpy.control.end()
