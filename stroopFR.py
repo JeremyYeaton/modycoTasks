@@ -16,6 +16,11 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		'b': ['BLEU',xpy.misc.constants.C_BLUE],
 		'y': ['JAUNE',xpy.misc.constants.C_YELLOW]
 		}
+clrs = [key for key in Vars]
+clrTrials = []
+for c1 in clrs:
+	for c2 in clrs:
+		clrTrials.append(''.join([c1,c2]))
 
 wordDict = {'g':Vars['g'][0],
 			'r':Vars['r'][0],
@@ -29,11 +34,14 @@ wordDict = {'g':Vars['g'][0],
 trial_types = [['gR','rR','bR','yR'],['gW','rW','bW','yW'],
 			   ['gg','gb','gr','gy','bb','bg','br','by','rr','rb','rg','ry','yy',
 				   'yr','yb','yg','tg','tb','tr','ty','ng','nb','nr','ny','mg',
-				   'mb','mr','my','pg','pb','pr','py'],
-			   ['gR','rR','bR','yR','gW','rW','bW','yW','gg','gb','gr','gy',
-				   'bb','bg','br','by','rr','rb','rg','ry','yy','yr','yb','yg',
-				   'tg','tb','tr','ty','ng','nb','nr','ny','mg', 'mb','mr','my',
-				   'pg','pb','pr','py']]
+				   'mb','mr','my','pg','pb','pr','py'],[]]
+for tType in clrTrials:
+	trial_types[3].append(tType)
+	for t in trial_types[1]:
+		trial_types[3].append(t)
+trial_types
+
+
 '''
 add block of colored/uncolored but only respond to word content?
 add time piece to instructions
@@ -93,7 +101,7 @@ retryTxt = """Pas exactement. Rappelez:
 %s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n\n 
 Appuyez sur ESPACE pour ressayer."""%keyAssign
 
-instr = [rectInstr, txtInstr, cTxtInstr, switchInstr,rappelInstr]
+instr = [rectInstr, txtInstr, cTxtInstr,switchInstr,rappelInstr]
 
 def instrTrial(Instructions,block_name):
 	trial_name = xpy.design.Trial()
@@ -151,14 +159,6 @@ def clrTrial(trial_name, block_name):
 	trial_name.set_factor(name = "Letter", value = Vars[clrName][3])
 	block_name.add_trial(trial_name)
 	
-'''
-practice block
-draw 5 trials
-identify correct responses
-if < 4 correct, try again
-
-'''
-
 def addBlock(block, prac = bool):
 	blockNum = block
 	if prac == True:
@@ -267,72 +267,3 @@ for i in range(0,4):
 	blNum += 1
 
 xpy.control.end()
-#%%
-
-#def addPracBlock(block):
-#	blockNum = block
-#	block = xpy.design.Block(name = block)
-#	trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],1)
-#	for trial in trials:
-#		if trial[1] == 'R':
-#			rectTrial(trial,block)
-#		elif trial[1] == 'W':
-#			bwTrial(trial,block)
-#		else:
-#			clrTrial(trial,block)
-#	exp.add_block(block)
-
-#def presentBlock(block_start,block_stop):
-#	for block in exp.blocks[block_start:block_stop]:
-#		cross.present()
-#		for trial in block.trials:
-#			keyPresent()
-#			cross.present(clear = False, update = True)
-#			exp.clock.wait(rnd.randint(500,1000))
-#			keyPresent()
-#			trial.stimuli[0].present(clear = False, update= True)
-#			key, rt = exp.keyboard.wait([xpy.misc.constants.K_d,
-#	                                     xpy.misc.constants.K_f,
-#										  xpy.misc.constants.K_j,
-#										  xpy.misc.constants.K_k],
-#										duration = 1500)
-#			exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
-#					trial.get_factor("Color"), trial.get_factor("Text") ,
-#					trial.get_factor("Letter"), key, rt])
-#			blank.present(clear = True, update= False)
-#			keyPresent()
-#			repKeyVars[3].present(clear = False,update = True)
-#			exp.clock.wait(500)
-
-
-
-	
-#introRect = xpy.design.Block(name = "IntroRect")
-#instrTrial(instr[0],introRect)
-#exp.add_block(introRect)
-#
-#addBlock(blockNumber)
-#
-#blockNumber += 1
-#
-#introBW = xpy.design.Block(name = "IntroBW")
-#instrTrial(instr[1],introBW)
-#exp.add_block(introBW)
-#
-#addBlock(blockNumber)
-#blockNumber += 1
-#
-#introClr = xpy.design.Block(name = "IntroClr")
-#instrTrial(instr[2],introClr)
-#exp.add_block(introClr)
-#
-#addBlock(blockNumber)
-#blockNumber += 1
-#
-#introSwitch = xpy.design.Block(name = "IntroSwitch")
-#instrTrial(instr[3],introSwitch)
-#instrTrial(instr[4],introSwitch)
-#exp.add_block(introSwitch)
-#
-#addBlock(blockNumber)
-#blockNumber += 1

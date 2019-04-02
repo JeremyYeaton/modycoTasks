@@ -37,7 +37,7 @@ for globLet in globalLetters:
 		
 globLocInstr = """Vous verrez des grandes lettres sur l'ecran.
 Ces lettres sont composees des lettres plus petites.
-Si la grande OU la petite sont un %s ou un %s
+Si la grande OU la petite est un %s ou un %s
 Appuyez sur %s.
 Sinon, appuyez sur %s.\n
 Appuyez sur ESPACE pour commencer.""" %(targets[0],targets[1],detect,falseKey)
@@ -53,6 +53,15 @@ inverseInstr = """Maintenant, si NI la grande, NI les petites sont des %s ou des
 Appuyez sur %s.
 Sinon, NE RIEN FAIRE.\n
 Appuyez sur ESPACE pour commencer.""" %(targets[0],targets[1],detect)
+
+sendOff = """Tres bien!\n\n 
+Appuyez sur ESPACE pour commencer."""
+
+retryTxt = """Pas exactement. Rappelez:
+STUFF \n\n 
+Appuyez sur ESPACE pour ressayer."""
+
+instructions = [globLocInstr,globInstr,locInstr,inverseInstr]
 
 globDict = {
 'H':[[1,0,0,0,0,0,0,1],
@@ -99,7 +108,7 @@ def instrTrial(Instructions,block_name):
 	trial_name.add_stimulus(stim)
 	block_name.add_trial(trial_name)
 
-def mkTrial(trial_name, block, bName):
+def mkTrial(trial_name, block):
 	templates = copy.deepcopy(globDict)
 	t_name = trial_name
 	glob = t_name[0]
@@ -125,7 +134,7 @@ def mkTrial(trial_name, block, bName):
 	trial_name.set_factor(name = "Local", value = loc)
 	trial_name.set_factor(name = "Targets", value = ''.join(targets))
 	trial_name.set_factor(name = "Local", value = loc)
-	trial_name.set_factor(name = "repCorr", value = getResponse(bName,glob,loc))
+	trial_name.set_factor(name = "repCorr", value = getResponse(block.name,glob,loc))
 	block.add_trial(trial_name)
 
 def getResponse(block,glob,loc):
@@ -146,38 +155,62 @@ def getResponse(block,glob,loc):
 			rep = 'None'
 	return rep
 
-def addBlock(block):
-	bName = block
+def addBlock(block, prac = int):
+	blockNum = block
+	if prac == True:
+		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,1)
+		trials = rnd.choices(trials,k=5)
+		block = ''.join([str(blockNum),' Practice'])
+	else:
+		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,n_scrambles)
 	block = xpy.design.Block(name = block)
-	trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,n_scrambles)
 	for trial in trials:
-		mkTrial(trial,block,bName)
+		mkTrial(trial,block)
 	exp.add_block(block)
 	
-def presentInstr(block_start,block_stop):
-	for block in exp.blocks[block_start:block_stop]:
+def presentInstr(blockNum):
+	for block in exp.blocks[blockNum:blockNum + 1]:
 		for trial in block.trials:
 			trial.stimuli[0].present(clear = True, update = True)
 			exp.keyboard.wait(xpy.misc.constants.K_SPACE)
 
-def presentBlock(block_start,block_stop):
-	for block in exp.blocks[block_start:block_stop]:
-		cross.present()
-		for trial in block.trials:
-			cross.present(clear = True, update = True)
-			exp.clock.wait(rnd.randint(500,1000))
-			trial.stimuli[0].present(clear = True, update= True)
-			exp.clock.wait(250)
-			blank.present(clear = True, update= True)
-			key, rt = exp.keyboard.wait([xpy.misc.constants.K_f,
-												xpy.misc.constants.K_j]
-										,duration = 750)
-			exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
-					trial.get_factor("Global"), trial.get_factor("Local"),
-					trial.get_factor("Targets"),trial.get_factor("repCorr"),
-					key, rt])
-			blank.present(clear = True, update= False)
-			exp.clock.wait(500)
+def presentBlock(blockNum, prac = int):
+	ready = False
+	while ready == False:
+		err = 0
+		for block in exp.blocks[blockNum:blockNum + 1]:
+			cross.present()
+			for trial in block.trials:
+				cross.present(clear = True, update = True)
+				exp.clock.wait(rnd.randint(500,1000))
+				trial.stimuli[0].present(clear = True, update= True)
+				exp.clock.wait(250)
+				blank.present(clear = True, update= True)
+				key, rt = exp.keyboard.wait([xpy.misc.constants.K_f,
+													xpy.misc.constants.K_j]
+											,duration = 1250)
+				exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
+						trial.get_factor("Global"), trial.get_factor("Local"),
+						trial.get_factor("Targets"),trial.get_factor("repCorr"),
+						key, rt])
+				blank.present(clear = True, update= False)
+				exp.clock.wait(500)
+				if key != trial.get_factor("repCorr"):
+					err += 1
+			if prac != 1:
+				ready = True
+			elif err < 3 and prac == 1:
+				ready = True
+				sendoff.present()
+				exp.keyboard.wait(xpy.misc.constants.K_SPACE)
+			else:
+				retry.present()
+				exp.keyboard.wait(xpy.misc.constants.K_SPACE)
+
+sendoff = xpy.stimuli.TextBox(sendOff,(750,300),(0,-100))
+sendoff.preload()
+retry = xpy.stimuli.TextBox(retryTxt,(750,300),(0,-100))
+retry.preload()
 	
 cross = xpy.stimuli.FixCross((25,25),(0,0),4)
 cross.preload()
@@ -185,52 +218,29 @@ cross.preload()
 blank = xpy.stimuli.BlankScreen()
 blank.preload()
 
-introGlobLoc = xpy.design.Block(name = "introGlobLoc")
-instrTrial(globLocInstr,introGlobLoc)
-exp.add_block(introGlobLoc)
+blockNames = ["introGlobLoc",0,"introGlob",1,"introLoc",2,"introInverse",3]
+instrNum = 0
 
-addBlock(blocks[0])
-
-introGlob = xpy.design.Block(name = "introGlob")
-instrTrial(globInstr,introGlob)
-exp.add_block(introGlob)
-
-addBlock(blocks[1])
-
-introLoc = xpy.design.Block(name = "introLoc")
-instrTrial(locInstr,introLoc)
-exp.add_block(introLoc)
-
-addBlock(blocks[2])
-
-introInverse = xpy.design.Block(name = "introInverse")
-instrTrial(inverseInstr,introInverse)
-exp.add_block(introInverse)
-
-addBlock(blocks[3])
+for blck in blockNames:
+	if type(blck) == str:
+		Block = xpy.design.Block(name = blck)
+		instrTrial(instructions[instrNum],Block)
+		exp.add_block(Block)
+		instrNum += 1
+	elif type(blck) == int:
+		addBlock(blck,prac = 1)
+		addBlock(blck)
 
 exp.data_variable_names = ["Block", "Trial", "Type", "Global", "Local","Targets","repCorr", "Key", "RT"]
 
 xpy.control.start(skip_ready_screen = True)
 blNum = 0
-presentInstr(blNum,blNum + 1)
-blNum += 1
-presentBlock(blNum,blNum + 1)
-blNum += 1
-
-presentInstr(blNum,blNum + 1)
-blNum += 1
-presentBlock(blNum,blNum + 1)
-blNum += 1
-
-presentInstr(blNum,blNum + 1)
-blNum += 1
-presentBlock(blNum,blNum + 1)
-blNum += 1
-
-presentInstr(blNum,blNum + 1)
-blNum += 1
-presentBlock(blNum,blNum + 1)
-blNum += 1
+for i in range(0,4):
+	presentInstr(blNum)
+	blNum += 1
+	presentBlock(blNum,prac = 1)
+	blNum += 1
+	presentBlock(blNum)
+	blNum += 1
 
 xpy.control.end()
