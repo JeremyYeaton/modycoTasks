@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Stroop task in French (adaptable for other languages)
 Author: Jeremy Yeaton
@@ -5,6 +6,12 @@ Author: Jeremy Yeaton
 '''
 
 import expyriment as xpy, random as rnd
+
+subNum = int(input("Subject number: "))
+'''
+add block of colored/uncolored but only respond to word content?
+add time piece to instructions
+'''
 
 xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Stroop French")
@@ -16,6 +23,22 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		'b': ['BLEU',xpy.misc.constants.C_BLUE],
 		'y': ['JAUNE',xpy.misc.constants.C_YELLOW]
 		}
+
+n_scrambles = 2
+#blockNumber = 0
+repNums = [100,102,106,107]
+repKeys = ['D','F','J','K']
+a = [key for key in Vars.keys()]
+rnd.shuffle(a)
+
+xCoord = [-100,-50,50,100]
+repKeyVars = [0,0,0,0]
+yCoord = -200
+side = 40
+
+for i, j in enumerate(a):
+	Vars[j].append(repKeys[i])
+	Vars[j].append(repNums[i])
 clrs = [key for key in Vars]
 clrTrials = []
 for c1 in clrs:
@@ -41,28 +64,6 @@ for tType in clrTrials:
 		trial_types[3].append(t)
 trial_types
 
-
-'''
-add block of colored/uncolored but only respond to word content?
-add time piece to instructions
-implement practice
-'''
-n_scrambles = 2
-blockNumber = 0
-repNums = [100,102,106,107]
-repKeys = ['D','F','J','K']
-a = [key for key in Vars.keys()]
-rnd.shuffle(a)
-
-xCoord = [-100,-50,50,100]
-repKeyVars = [0,0,0,0]
-yCoord = -200
-side = 40
-
-for i, j in enumerate(a):
-	Vars[j].append(repKeys[i])
-	Vars[j].append(repNums[i])
-	
 keyAssign = (Vars[a[0]][0],Vars[a[1]][0],Vars[a[2]][0],Vars[a[3]][0])
 blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2,"IntroSwitch",3]
 instructions = {}
@@ -221,8 +222,8 @@ def presentBlock(blockNum,prac = int):
 				key, rt = exp.keyboard.wait([xpy.misc.constants.K_d,
 		                                     xpy.misc.constants.K_f,
 											  xpy.misc.constants.K_j,
-											  xpy.misc.constants.K_k],
-											duration = 1500)
+											  xpy.misc.constants.K_k]
+											,duration = 1500)
 				exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
 						trial.get_factor("Color"), trial.get_factor("Text") ,
 						trial.get_factor("Letter"), key, rt])
@@ -256,7 +257,7 @@ retry.preload()
 
 exp.data_variable_names = ["Block", "Trial", "Type", "Color", "Text", "Letter", "Key", "RT"]
 
-xpy.control.start(skip_ready_screen = True)
+xpy.control.start(skip_ready_screen = True,subject_id = subNum)
 blNum = 0
 for i in range(0,4):
 	presentInstr(blNum)

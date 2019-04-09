@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Modified Navon visual task
 Author: Jeremy Yeaton
@@ -6,9 +7,12 @@ Author: Jeremy Yeaton
 
 import expyriment as xpy, random as rnd, copy
 
+subNum = int(input("Subject number: "))
+
 xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Navon")
 xpy.control.initialize(exp)
+
 
 n_scrambles = 1
 
@@ -16,43 +20,52 @@ n_scrambles = 1
 implement practice
 discuss time in instructions
 '''
-blocks = ['globLoc','glob','loc','inverse']
+expBlockNames = ['gbLc','glob','loca','nvrs']
 globalLetters = ['O','S','H','L','A']
 localLetters = ['O','S','H','L','A']
 
 repKeys = {'F':[xpy.misc.constants.K_f,102],
 		   'J':[xpy.misc.constants.K_j,106]}
 
-detect = rnd.choice([key for key in repKeys])
-falseKey = 'F'
-if detect == 'F':
+if subNum % 2 == 0:
+	detect = 'F'
 	falseKey = 'J'
+else:
+	detect = 'J'
+	falseKey = 'F'
+
 targets = rnd.choices(globalLetters,k=2)
 
 trial_types = []
 for globLet in globalLetters:
-	locLet = 'A'
-#	for locLet in localLetters:
-	trial_types.append(''.join([globLet,locLet]))
+	for locLet in localLetters:
+		trial_types.append(''.join([globLet,locLet]))
 		
-globLocInstr = """Vous verrez des grandes lettres sur l'ecran.
-Ces lettres sont composees des lettres plus petites.
-Si la grande OU la petite est un %s ou un %s
-Appuyez sur %s.
-Sinon, appuyez sur %s.\n
-Appuyez sur ESPACE pour commencer.""" %(targets[0],targets[1],detect,falseKey)
-globInstr = """Maintenant, si la GRANDE est un %s ou un %s
-N'importe la petite, appuyez sur %s.
-Sinon, appuyez sur %s.\n
-Appuyez sur ESPACE pour commencer.""" %(targets[0],targets[1],detect,falseKey)
-locInstr = """Maintenant, si les PETITES sont des %s ou des %s
-N'importe la grande, appuyez sur %s.
-Sinon, appuyez sur %s.\n
-Appuyez sur ESPACE pour commencer.""" %(targets[0],targets[1],detect,falseKey)
-inverseInstr = """Maintenant, si NI la grande, NI les petites sont des %s ou des %s
-Appuyez sur %s.
-Sinon, NE RIEN FAIRE.\n
-Appuyez sur ESPACE pour commencer.""" %(targets[0],targets[1],detect)
+globLocInstr1 = """Tu vas voir apparaitre sur l’écran une lettre, composée d’autres lettres. 
+Ces lettres peuvent être identiques ou différentes. 
+Tu devras indiquer si la lettre est / ou contient (les lettres) %s ou %s.\n
+Appuie sur ESPACE pour continuer."""%(targets[0],targets[1])
+globLocInstr2 = """Si elle est / ou contient un %s ou un %s, appuie sur %s, 
+sinon appuie sur %s. 
+Essaie d’être aussi rapide et correcte que possible !\n
+Appuie sur ESPACE pour essayer.""" %(targets[0],targets[1],detect,falseKey)
+
+globInstr1 = """Merci ! Un exercice du même genre mais cette fois-ci, 
+il faudra indiquer si la lettre est un %s ou un %s, 
+quelles que soient les lettres qui la composent.\n
+Appuie sur ESPACE pour continuer."""%(targets[0],targets[1])
+globInstr2 = """Si elle est un %s ou un %s, appuie sur %s, 
+sinon appuie sur %s.
+Essaie d’être aussi rapide et correcte que possible !\n
+Appuie sur ESPACE pour essayer."""%(targets[0],targets[1],detect,falseKey)
+
+locInstr1 = """Et maintenant, il faudra indiquer si les composants de la lettre 
+(qu’elle que soit cette lettre) sont des %s ou des %s.\n
+Appuie sur ESPACE pour continuer."""%(targets[0],targets[1]) 
+locInstr2 = """Si elles sont des %s ou des %s, appuie sur %s, 
+sinon appuie sur %s. 
+Essaie d’être aussi rapide et correcte que possible !\n
+Appuie sur ESPACE pour essayer."""%(targets[0],targets[1],detect,falseKey)
 
 sendOff = """Tres bien!\n\n 
 Appuyez sur ESPACE pour commencer."""
@@ -60,8 +73,6 @@ Appuyez sur ESPACE pour commencer."""
 retryTxt = """Pas exactement. Rappelez:
 STUFF \n\n 
 Appuyez sur ESPACE pour ressayer."""
-
-instructions = [globLocInstr,globInstr,locInstr,inverseInstr]
 
 globDict = {
 'H':[[1,0,0,0,0,0,0,1],
@@ -134,21 +145,21 @@ def mkTrial(trial_name, block):
 	trial_name.set_factor(name = "Local", value = loc)
 	trial_name.set_factor(name = "Targets", value = ''.join(targets))
 	trial_name.set_factor(name = "Local", value = loc)
-	trial_name.set_factor(name = "repCorr", value = getResponse(block.name,glob,loc))
+	trial_name.set_factor(name = "repCorr", value = getResponse(block.name[0:4],glob,loc))
 	block.add_trial(trial_name)
 
 def getResponse(block,glob,loc):
 	rep = repKeys[falseKey][1]
-	if block == 'globLoc':
+	if block == 'gbLc':
 		if glob in targets or loc in targets:
 			rep = repKeys[detect][1]
 	elif block == 'glob':
 		if glob in targets:
 			rep = repKeys[detect][1]
-	elif block == 'loc':
+	elif block == 'loca':
 		if loc in targets:
 			rep = repKeys[detect][1]
-	elif block == 'inverse':
+	elif block == 'nvrs':
 		if glob not in targets and loc not in targets:
 			rep = repKeys[detect][1]
 		else:
@@ -163,7 +174,7 @@ def addBlock(block, prac = int):
 		block = ''.join([str(blockNum),' Practice'])
 	else:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,n_scrambles)
-	block = xpy.design.Block(name = block)
+	block = xpy.design.Block(name = expBlockNames[blockNum])
 	for trial in trials:
 		mkTrial(trial,block)
 	exp.add_block(block)
@@ -185,10 +196,10 @@ def presentBlock(blockNum, prac = int):
 				exp.clock.wait(rnd.randint(500,1000))
 				trial.stimuli[0].present(clear = True, update= True)
 				exp.clock.wait(250)
-				blank.present(clear = True, update= True)
+#				blank.present(clear = True, update= True)
 				key, rt = exp.keyboard.wait([xpy.misc.constants.K_f,
-													xpy.misc.constants.K_j]
-											,duration = 1250)
+													xpy.misc.constants.K_j])
+#											,duration = 1250)
 				exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
 						trial.get_factor("Global"), trial.get_factor("Local"),
 						trial.get_factor("Targets"),trial.get_factor("repCorr"),
@@ -218,22 +229,24 @@ cross.preload()
 blank = xpy.stimuli.BlankScreen()
 blank.preload()
 
-blockNames = ["introGlobLoc",0,"introGlob",1,"introLoc",2,"introInverse",3]
-instrNum = 0
+blockNames = ["introGlobLoc",0,"introGlob",1,"introLoc",2]
+instrDict = {"introGlobLoc":[globLocInstr1,globLocInstr2],
+			"introGlob":[globInstr1,globInstr2],
+			"introLoc": [locInstr1,locInstr2]}
 
 for blck in blockNames:
 	if type(blck) == str:
 		Block = xpy.design.Block(name = blck)
-		instrTrial(instructions[instrNum],Block)
+		for instr in instrDict[blck]:
+			instrTrial(instr,Block)
 		exp.add_block(Block)
-		instrNum += 1
 	elif type(blck) == int:
 		addBlock(blck,prac = 1)
 		addBlock(blck)
 
 exp.data_variable_names = ["Block", "Trial", "Type", "Global", "Local","Targets","repCorr", "Key", "RT"]
 
-xpy.control.start(skip_ready_screen = True)
+xpy.control.start(skip_ready_screen = True,subject_id = subNum)
 blNum = 0
 for i in range(0,4):
 	presentInstr(blNum)
