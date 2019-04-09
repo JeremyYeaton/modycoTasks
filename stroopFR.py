@@ -68,41 +68,40 @@ keyAssign = (Vars[a[0]][0],Vars[a[1]][0],Vars[a[2]][0],Vars[a[3]][0])
 blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2,"IntroSwitch",3]
 instructions = {}
 
-rectInstr = """Vous verrez des rectangles sur l'ecran.\n Si le couleur du rectangle est:
-%s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n
-Appuyez sur ESPACE pour continuer."""%keyAssign
+rectInstr = """Tu vas voir apparaitre des rectangles de couleur sur l’écran. 
+Tu vas devoir appuyer sur la touche qui correspond à la couleur vue sur l’écran.
+Si un rectangle rouge apparait, tu dois appuyer sur la couleur rouge.\n
+Appuie sur ESPACE pour continuer."""
 
-timeInstr = """Vous avez un temps limite pour chaque item.
-Essayez de repondre aussi vite et correctement que possible.
-Si vous ne repondez pas assez rapidement, vous allez avancer a la suivante.
-Appuyez sur ESPACE pour essayer."""
+timeInstr = """Essaie d’être aussi rapide et correcte que possible ! 
+Si tu réponds pas assez rapidement, tu passeras automatiquement à l’item suivant.\n
+Appuie sur ESPACE pour continuer."""
 
-txtInstr = """Vous verrez des mots sur l'ecran.\n Si le mot est:
-%s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n
-Appuyez sur ESPACE pour continuer."""%keyAssign
+repere = """Avant de commencer, repère bien les couleurs sur le clavier:
+%s, appuie sur D.\n %s, appuie sur F.\n %s, appuie sur J\n %s, appuie sur K.\n
+Appuie sur ESPACE pour essayer."""%keyAssign
 
-cTxtInstr = """Vous verrez des mots en couleur sur l'ecran.\n 
-Si le COULEUR DU MOT est:
-%s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n
-Appuyez sur ESPACE pour continuer."""%keyAssign
+txtInstr = """Tu vas voir apparaitre sur l’écran des mots du lexique des couleurs. 
+Ces mots sont écrits en noir et blanc. 
+Tu vas devoir appuyer sur la touche qui correspond à la couleur exprimée par le mot. 
+Si le mot ROUGE apparait, tu dois appuyer sur la couleur rouge.\n
+Appuie sur ESPACE pour continuer."""
 
-switchInstr = """Vous verrez une melange de tous les types anterieurs sur l'ecran.
-Pour les rectangles, repondez selon le couleur.
-Pour les mots en blancs, repondez selon le sens du mot.
-Pour les mots en couleur, repondez selon le COULEUR DU MOT.\n
-Appuyez sur ESPACE pour continuer.""" 
-
-rappelInstr = """Rappelez:\n %s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n\n 
-Appuyez sur ESPACE pour commencer."""%keyAssign
+cTxtInstr = """Maintenant, tu vas voir apparaitre sur l’écran des mots qui feront référence 
+soit au lexique des couleurs, soit au lexique courant du français. 
+Ces mots sont écrits dans différentes couleurs, et tu vas devoir 
+appuyer sur la touche qui correspond à la couleur dans laquelle le mot est écrit. 
+Si le mot JAUNE est écrit en rouge, tu dois appuyer sur la couleur rouge.\n
+Appuie sur ESPACE pour continuer."""
 
 sendOff = """Tres bien!\n\n 
-Appuyez sur ESPACE pour commencer."""
+Appuie sur ESPACE pour commencer."""
 
-retryTxt = """Pas exactement. Rappelez:
-%s, appuyez D.\n %s, appuyez F.\n %s, appuyez J\n %s, appuyez K.\n\n 
-Appuyez sur ESPACE pour ressayer."""%keyAssign
+retryTxt = """Pas exactement. Rappel:
+%s, appuie sur D.\n %s, appuie sur F.\n %s, appuie sur J\n %s, appuie sur K.\n\n 
+Appuie sur ESPACE pour ressayer."""%keyAssign
 
-instr = [rectInstr, txtInstr, cTxtInstr,switchInstr,rappelInstr]
+instr = [rectInstr, txtInstr, cTxtInstr]
 
 def instrTrial(Instructions,block_name):
 	trial_name = xpy.design.Trial()
@@ -189,13 +188,15 @@ def keyPresent():
 	repKeyVars[2].present(clear = False,update = False)
 	repKeyVars[3].present(clear = False,update = False)
 	
-blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2,"IntroSwitch",3]
+blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2]
 instrNum = 0
 
 for blck in blockNames:
 	if type(blck) == str:
 		Block = xpy.design.Block(name = blck)
 		instrTrial(instr[instrNum],Block)
+		instrTrial(timeInstr,Block)
+		instrTrial(repere,Block)
 		exp.add_block(Block)
 		instrNum += 1
 	elif type(blck) == int:
