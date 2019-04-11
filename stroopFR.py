@@ -16,6 +16,7 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		'b': ['BLEU',xpy.misc.constants.C_BLUE],
 		'y': ['JAUNE',xpy.misc.constants.C_YELLOW]
 		}
+
 clrs = [key for key in Vars]
 clrTrials = []
 for c1 in clrs:
