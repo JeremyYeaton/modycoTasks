@@ -24,8 +24,6 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		'y': ['JAUNE',xpy.misc.constants.C_YELLOW]
 		}
 
-<<<<<<< HEAD
-=======
 n_scrambles = 2
 #blockNumber = 0
 repNums = [100,102,106,107]
@@ -41,7 +39,7 @@ side = 40
 for i, j in enumerate(a):
 	Vars[j].append(repKeys[i])
 	Vars[j].append(repNums[i])
->>>>>>> 0d6d38804508553ce1026a62cec40bc0d32e1b5e
+
 clrs = [key for key in Vars]
 clrTrials = []
 for c1 in clrs:
