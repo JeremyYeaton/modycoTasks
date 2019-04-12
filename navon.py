@@ -198,8 +198,8 @@ def presentBlock(blockNum, prac = int):
 				exp.clock.wait(250)
 #				blank.present(clear = True, update= True)
 				key, rt = exp.keyboard.wait([xpy.misc.constants.K_f,
-													xpy.misc.constants.K_j])
-#											,duration = 1250)
+													xpy.misc.constants.K_j]
+											,duration = 1500)
 				exp.data.add([block.name, trial.id, trial.get_factor("Type"), 
 						trial.get_factor("Global"), trial.get_factor("Local"),
 						trial.get_factor("Targets"),trial.get_factor("repCorr"),

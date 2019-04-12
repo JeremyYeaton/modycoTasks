@@ -8,10 +8,6 @@ Author: Jeremy Yeaton
 import expyriment as xpy, random as rnd
 
 subNum = int(input("Subject number: "))
-'''
-add block of colored/uncolored but only respond to word content?
-add time piece to instructions
-'''
 
 xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Stroop French")
@@ -24,8 +20,8 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		'y': ['JAUNE',xpy.misc.constants.C_YELLOW]
 		}
 
+n_scrambles = [10,10,5]
 n_scrambles = 2
-#blockNumber = 0
 repNums = [100,102,106,107]
 repKeys = ['D','F','J','K']
 a = [key for key in Vars.keys()]
@@ -40,11 +36,7 @@ for i, j in enumerate(a):
 	Vars[j].append(repKeys[i])
 	Vars[j].append(repNums[i])
 
-clrs = [key for key in Vars]
-clrTrials = []
-for c1 in clrs:
-	for c2 in clrs:
-		clrTrials.append(''.join([c1,c2]))
+
 
 wordDict = {'g':Vars['g'][0],
 			'r':Vars['r'][0],
@@ -55,15 +47,18 @@ wordDict = {'g':Vars['g'][0],
 			'm':'MAIN',
 			'p':'PIED'}
 
-trial_types = [['gR','rR','bR','yR'],['gW','rW','bW','yW'],
-			   ['gg','gb','gr','gy','bb','bg','br','by','rr','rb','rg','ry','yy',
-				   'yr','yb','yg','tg','tb','tr','ty','ng','nb','nr','ny','mg',
-				   'mb','mr','my','pg','pb','pr','py'],[]]
-for tType in clrTrials:
-	trial_types[3].append(tType)
-	for t in trial_types[1]:
-		trial_types[3].append(t)
-trial_types
+clrTrials = []
+for c1 in [key for key in wordDict]:
+	for c2 in [key for key in Vars]:
+		clrTrials.append(''.join([c1,c2]))
+
+trial_types = [['gR','rR','bR','yR'], ['gW','rW','bW','yW'], clrTrials]
+
+#for tType in clrTrials:
+#	trial_types[3].append(tType)
+#	for t in trial_types[1]:
+#		trial_types[3].append(t)
+#trial_types
 
 keyAssign = (Vars[a[0]][0],Vars[a[1]][0],Vars[a[2]][0],Vars[a[3]][0])
 blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2,"IntroSwitch",3]
@@ -160,14 +155,14 @@ def clrTrial(trial_name, block_name):
 	trial_name.set_factor(name = "Letter", value = Vars[clrName][3])
 	block_name.add_trial(trial_name)
 	
-def addBlock(block, prac = bool):
+def addBlock(block, scrambles, prac = bool):
 	blockNum = block
 	if prac == True:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],2)
 		trials = rnd.choices(trials,k=5)
 		block = ''.join([str(blockNum),' Practice'])
 	else:
-		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],n_scrambles)
+		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],scrambles)
 	block = xpy.design.Block(name = block)
 	for trial in trials:
 		if trial[1] == 'R':
@@ -201,8 +196,8 @@ for blck in blockNames:
 		exp.add_block(Block)
 		instrNum += 1
 	elif type(blck) == int:
-		addBlock(blck,prac = 1)
-		addBlock(blck)
+		addBlock(blck,n_scrambles, prac = 1)
+		addBlock(blck, n_scrambles)
 
 def presentInstr(blockNum):
 	for block in exp.blocks[blockNum:blockNum + 1]:
