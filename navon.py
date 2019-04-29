@@ -5,11 +5,11 @@ Author: Jeremy Yeaton
 24 March 2019
 '''
 
-import expyriment as xpy, random as rnd, copy
+import expyriment as xpy, numpy.random as rnd, copy
 
 subNum = int(input("Subject number: "))
 
-#xpy.control.set_develop_mode(True)
+xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Navon")
 xpy.control.initialize(exp)
 
@@ -34,7 +34,7 @@ else:
 	detect = 'J'
 	falseKey = 'F'
 
-targets = rnd.choices(globalLetters,k=3,replace=False)
+targets = rnd.choice(globalLetters,size=3,replace=False)
 
 trial_types = []
 for globLet in globalLetters:
@@ -72,9 +72,14 @@ Appuie sur ESPACE pour essayer."""%(targets[0],targets[1],detect,falseKey)
 sendOff = """Tres bien!\n\n 
 Appuyez sur ESPACE pour commencer."""
 
-retryTxt = """Pas exactement. Rappelez:
-STUFF \n\n 
-Appuyez sur ESPACE pour ressayer."""
+retryInstr = [globLocInstr2,globInstr2,locInstr2]
+def retryTxt(BlockText):
+	return("""Pas exactement. Rappelez:
+%s"""%BlockText)
+
+targets = targets[0:2]
+# retryTemp = """Pas exactement. Rappelez:
+# %s"""
 
 globDict = {
 'H':[[1,0,0,0,0,0,0,1],
@@ -172,7 +177,7 @@ def addBlock(block, prac = int):
 	blockNum = block
 	if prac == True:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,1)
-		trials = rnd.choices(trials,k=5,replace=False)
+		trials = rnd.choice(trials,size=5,replace=False)
 		block = ''.join([str(blockNum),' Practice'])
 	else:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,n_scrambles)
@@ -189,6 +194,9 @@ def presentInstr(blockNum):
 
 def presentBlock(blockNum, prac = int):
 	ready = False
+	if prac == 1:
+		retry = xpy.stimuli.TextBox(retryTxt(retryInstr[i]),(750,300),(0,-100))
+		retry.preload()
 	while ready == False:
 		err = 0
 		for block in exp.blocks[blockNum:blockNum + 1]:
@@ -223,8 +231,8 @@ def presentBlock(blockNum, prac = int):
 
 sendoff = xpy.stimuli.TextBox(sendOff,(750,300),(0,-100))
 sendoff.preload()
-retry = xpy.stimuli.TextBox(retryTxt,(750,300),(0,-100))
-retry.preload()
+# retry = xpy.stimuli.TextBox(retryTxt,(750,300),(0,-100))
+# retry.preload()
 	
 cross = xpy.stimuli.FixCross((25,25),(0,0),4)
 cross.preload()
