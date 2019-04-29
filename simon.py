@@ -1,6 +1,6 @@
 import expyriment as xpy
 
-xpy.control.set_develop_mode(True)
+# xpy.control.set_develop_mode(True)
 """Name your experiment"""
 exp = xpy.design.Experiment(name="Simon Task")
 xpy.control.initialize(exp)

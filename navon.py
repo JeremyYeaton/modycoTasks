@@ -9,7 +9,7 @@ import expyriment as xpy, random as rnd, copy
 
 subNum = int(input("Subject number: "))
 
-xpy.control.set_develop_mode(True)
+#xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Navon")
 xpy.control.initialize(exp)
 
@@ -20,7 +20,7 @@ n_scrambles = 1
 implement practice
 discuss time in instructions
 '''
-expBlockNames = ['gbLc','glob','loca','nvrs']
+expBlockNames = ['gbLc','glob','loca']
 globalLetters = ['O','S','H','L','A']
 localLetters = ['O','S','H','L','A']
 
@@ -34,7 +34,7 @@ else:
 	detect = 'J'
 	falseKey = 'F'
 
-targets = rnd.choices(globalLetters,k=2)
+targets = rnd.choices(globalLetters,k=3,replace=False)
 
 trial_types = []
 for globLet in globalLetters:
@@ -43,26 +43,28 @@ for globLet in globalLetters:
 		
 globLocInstr1 = """Tu vas voir apparaitre sur l’écran une lettre, composée d’autres lettres. 
 Ces lettres peuvent être identiques ou différentes. 
-Tu devras indiquer si la lettre est / ou contient (les lettres) %s ou %s.\n
+Tu devras indiquer si la lettre EST ou CONTIENT les lettres %s ou %s.\n
 Appuie sur ESPACE pour continuer."""%(targets[0],targets[1])
-globLocInstr2 = """Si elle est / ou contient un %s ou un %s, appuie sur %s, 
-sinon appuie sur %s. 
+globLocInstr2 = """Si elle EST ou CONTIENT un %s ou un %s, appuie sur %s, 
+sinon appuie sur %s.
+Par exemple, si un grand %s apparait, ou un grand %s composé des petits %s, tu dois appuyer sur %s.
 Essaie d’être aussi rapide et correcte que possible !\n
-Appuie sur ESPACE pour essayer.""" %(targets[0],targets[1],detect,falseKey)
+Appuie sur ESPACE pour essayer.""" %(targets[0],targets[1],detect,falseKey,targets[0],targets[2],targets[1],detect)
 
-globInstr1 = """Merci ! Un exercice du même genre mais cette fois-ci, 
-il faudra indiquer si la lettre est un %s ou un %s, 
+globInstr1 = """Maintenant, un exercice du même genre mais cette fois-ci, 
+il faudra juste indiquer si la lettre EST un %s ou un %s, 
 quelles que soient les lettres qui la composent.\n
 Appuie sur ESPACE pour continuer."""%(targets[0],targets[1])
-globInstr2 = """Si elle est un %s ou un %s, appuie sur %s, 
+globInstr2 = """Si elle EST un %s ou un %s, appuie sur %s, 
 sinon appuie sur %s.
+Par exemple, si un grand %s apparait, tu dois toujours appuyer sur %s.
 Essaie d’être aussi rapide et correcte que possible !\n
-Appuie sur ESPACE pour essayer."""%(targets[0],targets[1],detect,falseKey)
+Appuie sur ESPACE pour essayer."""%(targets[0],targets[1],detect,falseKey,targets[0],detect)
 
-locInstr1 = """Et maintenant, il faudra indiquer si les composants de la lettre 
+locInstr1 = """Et maintenant, il faudra indiquer si les COMPOSANTS de la lettre 
 (qu’elle que soit cette lettre) sont des %s ou des %s.\n
 Appuie sur ESPACE pour continuer."""%(targets[0],targets[1]) 
-locInstr2 = """Si elles sont des %s ou des %s, appuie sur %s, 
+locInstr2 = """Si les COMPOSANTS (petites lettres) sont des %s ou des %s, appuie sur %s, 
 sinon appuie sur %s. 
 Essaie d’être aussi rapide et correcte que possible !\n
 Appuie sur ESPACE pour essayer."""%(targets[0],targets[1],detect,falseKey)
@@ -114,7 +116,7 @@ globDict = {
 
 def instrTrial(Instructions,block_name):
 	trial_name = xpy.design.Trial()
-	stim = xpy.stimuli.TextBox(Instructions,(750,300),(0,-100))
+	stim = xpy.stimuli.TextBox(Instructions,(750,500),(0,-100),text_size = 40)
 	stim.preload()
 	trial_name.add_stimulus(stim)
 	block_name.add_trial(trial_name)
@@ -170,7 +172,7 @@ def addBlock(block, prac = int):
 	blockNum = block
 	if prac == True:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,1)
-		trials = rnd.choices(trials,k=5)
+		trials = rnd.choices(trials,k=5,replace=False)
 		block = ''.join([str(blockNum),' Practice'])
 	else:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types,n_scrambles)
@@ -206,11 +208,12 @@ def presentBlock(blockNum, prac = int):
 						key, rt])
 				blank.present(clear = True, update= False)
 				exp.clock.wait(500)
-				if key != trial.get_factor("repCorr"):
+				if key != trial.get_factor("repCorr") and prac == 1:
 					err += 1
+					break
 			if prac != 1:
 				ready = True
-			elif err < 3 and prac == 1:
+			elif err == 0 and prac == 1:
 				ready = True
 				sendoff.present()
 				exp.keyboard.wait(xpy.misc.constants.K_SPACE)
@@ -248,7 +251,7 @@ exp.data_variable_names = ["Block", "Trial", "Type", "Global", "Local","Targets"
 
 xpy.control.start(skip_ready_screen = True,subject_id = subNum)
 blNum = 0
-for i in range(0,4):
+for i in range(0,3):
 	presentInstr(blNum)
 	blNum += 1
 	presentBlock(blNum,prac = 1)
@@ -256,4 +259,4 @@ for i in range(0,4):
 	presentBlock(blNum)
 	blNum += 1
 
-xpy.control.end()
+xpy.control.end(goodbye_text="Merci pour votre participation!")

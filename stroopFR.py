@@ -9,7 +9,7 @@ import expyriment as xpy, random as rnd
 
 subNum = int(input("Subject number: "))
 
-xpy.control.set_develop_mode(True)
+# xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Stroop French")
 xpy.control.initialize(exp)
 
@@ -21,7 +21,7 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		}
 
 n_scrambles = [10,10,5]
-n_scrambles = 2
+n_scrambles = 3
 repNums = [100,102,106,107]
 repKeys = ['D','F','J','K']
 a = [key for key in Vars.keys()]
@@ -35,8 +35,6 @@ side = 40
 for i, j in enumerate(a):
 	Vars[j].append(repKeys[i])
 	Vars[j].append(repNums[i])
-
-
 
 wordDict = {'g':Vars['g'][0],
 			'r':Vars['r'][0],
@@ -87,7 +85,7 @@ cTxtInstr = """Maintenant, tu vas voir apparaitre sur l’écran des mots qui fe
 soit au lexique des couleurs, soit au lexique courant du français. 
 Ces mots sont écrits dans différentes couleurs, et tu vas devoir 
 appuyer sur la touche qui correspond à la couleur dans laquelle le mot est écrit. 
-Si le mot JAUNE est écrit en rouge, tu dois appuyer sur la couleur rouge.\n
+Par exemple, si le mot JAUNE est écrit en rouge, tu dois appuyer sur la couleur rouge.\n
 Appuie sur ESPACE pour continuer."""
 
 sendOff = """Tres bien!\n\n 
@@ -159,7 +157,7 @@ def addBlock(block, scrambles, prac = bool):
 	blockNum = block
 	if prac == True:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],2)
-		trials = rnd.choices(trials,k=5)
+		trials = rnd.choices(trials,k=5,replace=False)
 		block = ''.join([str(blockNum),' Practice'])
 	else:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],scrambles)
@@ -256,7 +254,7 @@ exp.data_variable_names = ["Block", "Trial", "Type", "Color", "Text", "Letter", 
 
 xpy.control.start(skip_ready_screen = True,subject_id = subNum)
 blNum = 0
-for i in range(0,4):
+for i in range((int(len(blockNames)/2))):
 	presentInstr(blNum)
 	blNum += 1
 	presentBlock(blNum,prac = 1)
