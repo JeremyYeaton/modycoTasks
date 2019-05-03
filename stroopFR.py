@@ -5,7 +5,7 @@ Author: Jeremy Yeaton
 24 March 2019
 '''
 
-import expyriment as xpy, random as rnd
+import expyriment as xpy, numpy.random as rnd
 
 subNum = int(input("Subject number: "))
 
@@ -99,7 +99,7 @@ instr = [rectInstr, txtInstr, cTxtInstr]
 
 def instrTrial(Instructions,block_name):
 	trial_name = xpy.design.Trial()
-	stim = xpy.stimuli.TextBox(Instructions,(750,300),(0,-100))
+	stim = xpy.stimuli.TextBox(Instructions,(750,500),(0,-100),text_size = 30)
 	stim.preload()
 	trial_name.add_stimulus(stim)
 	block_name.add_trial(trial_name)
@@ -157,7 +157,7 @@ def addBlock(block, scrambles, prac = bool):
 	blockNum = block
 	if prac == True:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],2)
-		trials = rnd.choices(trials,k=5,replace=False)
+		trials = rnd.choice(trials,size=5,replace=False)
 		block = ''.join([str(blockNum),' Practice'])
 	else:
 		trials = xpy.design.randomize.make_multiplied_shuffled_list(trial_types[blockNum],scrambles)

@@ -121,7 +121,7 @@ globDict = {
 
 def instrTrial(Instructions,block_name):
 	trial_name = xpy.design.Trial()
-	stim = xpy.stimuli.TextBox(Instructions,(750,500),(0,-100),text_size = 40)
+	stim = xpy.stimuli.TextBox(Instructions,(750,500),(0,-100),text_size = 30)
 	stim.preload()
 	trial_name.add_stimulus(stim)
 	block_name.add_trial(trial_name)
