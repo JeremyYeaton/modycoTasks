@@ -40,24 +40,38 @@ for i = 1:nBlocks
         end
     end
 end
-%%
 
 for block = 1:nBlocks
     newBlock = emptyTable;
     for C = 1:3
-        n = 6;
-        for q = 1:height(questions)
-            if strcmp(questions{q},['C',num2str(C),'X']) == 1
-                newBlock(height(newBlock+1),:) = questions(q,:);
-                break
+        toPop = [];
+        for q = 1:length(questions)
+            for qIdx = 1:height(qTable)
+                if strcmp(questions{q},['C',num2str(C),'X']) == 1
+                    newBlock(height(newBlock)+1,:) = qTable(qIdx,:);
+                    toPop(end + 1) = q;
+                    break
+                end
             end
         end
-        for q = 1:height(holding)
-            if strcmp(questions{q},['C',num2str(C)]) == 1
-                newBlock(height(newBlock+1),:) = holding(q,:);
-                break
-            end
+        toPop = sort(toPop,'descend');
+        for k = toPop
+            qTable(k,:) = [];
         end
+%         toPop = [];
+%         for n = 1:6
+%             for q = 1:height(holding)
+%                 if strcmp(holding.condID(q),['C',num2str(C)]) == 1
+%                     newBlock(height(newBlock)+1,:) = holding(q,:);
+%                     toPop(end + 1) = q;
+%                     break
+%                 end
+%             end
+% %             toPop = sort(toPop,'descend');
+% %             for k = toPop
+% %                 holding(k,:) = [];
+% %             end
+%         end
     end
 end
 

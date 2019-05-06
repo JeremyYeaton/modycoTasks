@@ -11,11 +11,10 @@ max 3 in a row from same condition
 q min 6 apart
 
 
-send tutorials to LSF people
-send stimshuffle to Sebastien
-
 shuffle all
-draw 6 * 22 of conditions
+draw 6 * 8 of conditions
+
+per block:
 draw q's
 draw from list of conditions
 draw from remainder list
