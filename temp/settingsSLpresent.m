@@ -35,3 +35,5 @@ trialTimeout = 10;
 % the subject to press a key before every trial)
 timeBetweenTrials = 0;
 
+% Response pictures
+repPics = {'smileyRouge.jpg', 'smileyVert.jpg'};

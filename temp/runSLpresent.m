@@ -34,10 +34,13 @@ H=rect(RectBottom); % screen height
 Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
 
+file2 = 'MoDyCo'; % replace with question file later
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vids = {'consigne1','consigne 2'};
+% vids = {'consigne1','consigne 2'};
+vids = {'1C1','1C2','1C3'};
+vids = {'25 C1','25 C2','25 C3','26 C1'};
 folder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
 
 % Set up the output file
@@ -48,10 +51,17 @@ fprintf(outputfile, 'subID\t imageCondition\t trial\t textItem\t imageFile1\t im
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+smR = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\',repPics{1}));
+smV = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\',repPics{2}));
 
 % Start screen
 Screen('DrawText',window1,'Press the space bar to begin', (W/2-150), (H/2), textColor);
 Screen('Flip',window1)
+
+smRDisplay = Screen('MakeTexture', window1, smR);
+smVDisplay = Screen('MakeTexture', window1, smV);
+img3 = 127*ones([200 200 3]);
+blankDisplay = Screen('MakeTexture', window1, img3);
 % Wait for subject to press spacebar
 while 1
     [keyIsDown,secs,keyCode] = KbCheck;
@@ -65,13 +75,18 @@ for Idx = 1:length(vids)
     fixationDuration = 0.5; % Length of fixation in seconds
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1);
+    
+    % Blank screen
+    Screen(window1, 'FillRect', backgroundColor);
+    Screen('Flip', window1, tFixation + fixationDuration - slack,0);
+
     vid = vids{Idx};
     moviename = [folder, vid, '.mp4'];
-    if IsWin && ~IsOctave && psychusejava('jvm')
-        fprintf('Running on Matlab for Microsoft Windows, with JVM enabled!\n');
-        fprintf('This may crash. See ''help GStreamer'' for problem and workaround.\n');
-        warning('Running on Matlab for Microsoft Windows, with JVM enabled!');
-    end
+%     if IsWin && ~IsOctave && psychusejava('jvm')
+%         fprintf('Running on Matlab for Microsoft Windows, with JVM enabled!\n');
+%         fprintf('This may crash. See ''help GStreamer'' for problem and workaround.\n');
+%         warning('Running on Matlab for Microsoft Windows, with JVM enabled!');
+%     end
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     try
@@ -94,7 +109,7 @@ for Idx = 1:length(vids)
 
             % Draw the new texture immediately to screen:
             Screen('DrawTexture', window1, tex);
-
+            
             % Update display:
             Screen('Flip', window1);
 
@@ -110,6 +125,81 @@ for Idx = 1:length(vids)
     catch %#ok<CTCH>
         sca;
         psychrethrow(psychlasterror);
+    end
+    % Calculate image position (center of the screen)
+    imageSize = [200 200 3];%size(smR);
+    pos1 = [((W-imageSize(2))/2 - 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 - 300) ((H+imageSize(1))/2 + 300)];
+    pos2 = [((W-imageSize(2))/2 + 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 + 300) ((H+imageSize(1))/2 + 300)];
+
+
+    % Screen priority
+    Priority(MaxPriority(window1));
+    Priority(2);
+    % Show the images
+    rt = 0;
+    resp = 0;
+    currentDisplay = 1;
+    dur = imageDuration;
+    Screen(window1, 'FillRect', backgroundColor);
+    Screen('DrawTexture', window1, smRDisplay, [], pos1);
+    Screen('DrawTexture', window1, smVDisplay, [], pos2);
+    startTime = Screen('Flip', window1); % Start of trial
+%     Screen('DrawTexture', window1, blankDisplay, [], pos);
+    
+    % Get keypress response
+    while GetSecs - startTime < trialTimeout
+        [keyIsDown,secs,keyCode] = KbCheck;
+        respTime = GetSecs;
+        pressedKeys = find(keyCode);
+                
+%         % ESC key quits the experiment
+%         if keyCode(KbName('ESCAPE')) == 1
+%             clear all
+%             close all
+%             sca
+%             return;
+%         end
+        
+        % Check for response keys
+        if ~isempty(pressedKeys)
+            for i = 1:length(responseKeys)
+                if KbName(responseKeys{i}) == pressedKeys(1)
+                    resp = responseKeys{i};
+                    rt = respTime - startTime;
+                end
+            end
+        end
+        % Exit loop once a response is recorded
+        if rt > 0
+            break;
+        end
+    end
+    % Save results to file
+    fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
+        subID, Idx, vid, file2, resp, rt);
+    % Determine whether to take a break
+    if mod(Idx,breakAfterTrials) == 0
+        Screen('DrawText',window1,'Break time. Press space bar when you''re ready to continue', (W/2-300), (H/2), textColor);
+        Screen('Flip',window1)
+        % Wait for subject to press spacebar
+        while 1
+            [keyIsDown,secs,keyCode] = KbCheck;
+            if keyCode(KbName('space')) == 1
+                break
+            end
+        end
+    else
+    % Pause between trials
+        if timeBetweenTrials == 0
+            while 1 % Wait for space
+                [keyIsDown,secs,keyCode] = KbCheck;
+                if keyCode(KbName('space'))==1
+                    break
+                end
+            end
+        else
+            WaitSecs(timeBetweenTrials);
+        end
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,7 +222,7 @@ end
 function drawCross(window,W,H)
     barLength = 16; % in pixels
     barWidth = 2; % in pixels
-    barColor = 0.5; % number from 0 (black) to 1 (white) 
+    barColor = 255;%0.5; % number from 0 (black) to 1 (white) 
     Screen('FillRect', window, barColor,[ (W-barLength)/2 (H-barWidth)/2 (W+barLength)/2 (H+barWidth)/2]);
     Screen('FillRect', window, barColor ,[ (W-barWidth)/2 (H-barLength)/2 (W+barWidth)/2 (H+barLength)/2]);
 end
