@@ -40,8 +40,13 @@ file2 = 'MoDyCo'; % replace with question file later
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % vids = {'consigne1','consigne 2'};
 % vids = {'1C1','1C2','1C3'};
-vids = {'1 C1','1 C2','1 C3','2C1','2C2','2C3'};
-% vids = {'25 C1','25 C2','25 C3','26 C1'};
+vids = {};
+for cond = 1:10
+    for sent = 1:3
+        vids{length(vids) + 1} = [num2str(cond),' C',num2str(sent)];
+    end
+end
+        
 folder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
 
 % Set up the output file
@@ -52,8 +57,6 @@ fprintf(outputfile, 'subID\t trial\t videoFile\t questionFile\t response\t RT\n'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-smR = imread(fullfile(folder,repPics{1}));
-smV = imread(fullfile(folder,repPics{2}));
 
 % Start screen
 Screen('DrawText',window1,'Press the space bar to begin', (W/2-150), (H/2), textColor);
@@ -61,8 +64,9 @@ Screen('Flip',window1)
 
 smRDisplay = Screen('MakeTexture', window1, smR);
 smVDisplay = Screen('MakeTexture', window1, smV);
-img3 = 127*ones([200 200 3]);
-blankDisplay = Screen('MakeTexture', window1, img3);
+% img3 = 127*ones([200 200 3]);
+% blankDisplay = Screen('MakeTexture', window1, img3);
+
 % Wait for subject to press spacebar
 while 1
     [keyIsDown,secs,keyCode] = KbCheck;
@@ -73,13 +77,13 @@ end
 
 for Idx = 1:length(vids)
     % Show fixation cross
-    fixationDuration = 0.5; % Length of fixation in seconds
-    drawCross(window1,W,H);
-    tFixation = Screen('Flip', window1);
+    fixationDuration = 1; % Length of fixation in seconds
+%     drawCross(window1,W,H);
+%     tFixation = Screen('Flip', window1);
     
     % Blank screen
-    Screen(window1, 'FillRect', backgroundColor);
-    Screen('Flip', window1, tFixation + fixationDuration - slack,0);
+%     Screen(window1, 'FillRect', backgroundColor);
+%     Screen('Flip', window1, tFixation + fixationDuration - slack,0);
 
     vid = vids{Idx};
     moviename = [folder, vid, '.mp4'];
@@ -93,12 +97,24 @@ for Idx = 1:length(vids)
     try
         % Open movie file:
         movie = Screen('OpenMovie', window1, moviename);
-        start = 0;
-        dataOut = Idx + 100;
+        frame = 0;
+        dataOut = Idx + 100; % Define trigger value
 
         % Start playback engine:
         Screen('PlayMovie', movie, 1);
-
+        
+        % Draw fixation cross; sync to video onset / trigger
+        drawCross(window1,W,H);
+        tFixation = Screen('Flip', window1);
+%         Screen(window1, 'FillRect', backgroundColor);
+%         Screen('Flip', window1, tFixation + fixationDuration - slack,0);
+        
+        % Play first frame
+        tex = Screen('GetMovieImage', window1, movie);
+        Screen('DrawTexture', window1, tex);
+        io64(ioObj,address,dataOut); % send a signal
+        Screen('Flip', window1,tFixation + fixationDuration - slack,0);
+        
         % Playback loop: Runs until end of movie or keypress:
         while ~KbCheck
             % Wait for next movie frame, retrieve texture handle to it
@@ -115,10 +131,10 @@ for Idx = 1:length(vids)
             
             % Update display:
             Screen('Flip', window1);
-            if start < 10
-                io64(ioObj,address,dataOut); % send a signal
-                start = start + 1;
-            else
+            if frame < 12
+%                 io64(ioObj,address,dataOut); % send a signal
+                frame = frame + 1;
+            elseif dataOut ~= 0
                 io64(ioObj,address,0); % stop signal
             end
             % Release texture:
@@ -146,8 +162,8 @@ for Idx = 1:length(vids)
     % Show the images
     rt = 0;
     resp = 0;
-    currentDisplay = 1;
-    dur = imageDuration;
+%     currentDisplay = 1;
+%     dur = imageDuration;
     Screen(window1, 'FillRect', backgroundColor);
     Screen('DrawTexture', window1, smRDisplay, [], pos1);
     Screen('DrawTexture', window1, smVDisplay, [], pos2);
@@ -177,6 +193,8 @@ for Idx = 1:length(vids)
                     rt = respTime - startTime;
                 end
             end
+            drawCross(window1,W,H);
+            Screen('Flip', window1);
         end
         % Exit loop once a response is recorded
         if rt > 0

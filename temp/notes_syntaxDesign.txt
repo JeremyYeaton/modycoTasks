@@ -1,0 +1,29 @@
+for each block:
+1 C1 + Q
+1 C2 + Q
+1 C3 + Q
+6 x C1
+6 x C2
+6 x C3
+1 x random
+
+max 3 in a row from same condition
+q min 6 apart
+
+
+send tutorials to LSF people
+send stimshuffle to Sebastien
+
+shuffle all
+draw 6 * 22 of conditions
+draw q's
+draw from list of conditions
+draw from remainder list
+
+shuffle
+var for q's
+var for condition
+check that qvar is not less than 6 and not 1,2,3 or 20,21,22
+check that condVar is not greater than 3
+
+check that condVar does not exceed 3 across a block boundary
