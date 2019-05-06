@@ -39,20 +39,21 @@ file2 = 'MoDyCo'; % replace with question file later
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % vids = {'consigne1','consigne 2'};
-vids = {'1C1','1C2','1C3'};
-vids = {'25 C1','25 C2','25 C3','26 C1'};
+% vids = {'1C1','1C2','1C3'};
+vids = {'1 C1','1 C2','1 C3','2C1','2C2','2C3'};
+% vids = {'25 C1','25 C2','25 C3','26 C1'};
 folder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
 
 % Set up the output file
 resultsFolder = 'results';
 outputfile = fopen([resultsFolder '\resultfile_' num2str(subID) '.txt'],'a');
-fprintf(outputfile, 'subID\t imageCondition\t trial\t textItem\t imageFile1\t imageFile2\t response\t RT\n');
+fprintf(outputfile, 'subID\t trial\t videoFile\t questionFile\t response\t RT\n');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-smR = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\',repPics{1}));
-smV = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\',repPics{2}));
+smR = imread(fullfile(folder,repPics{1}));
+smV = imread(fullfile(folder,repPics{2}));
 
 % Start screen
 Screen('DrawText',window1,'Press the space bar to begin', (W/2-150), (H/2), textColor);
@@ -92,6 +93,8 @@ for Idx = 1:length(vids)
     try
         % Open movie file:
         movie = Screen('OpenMovie', window1, moviename);
+        start = 0;
+        dataOut = Idx + 100;
 
         % Start playback engine:
         Screen('PlayMovie', movie, 1);
@@ -112,11 +115,16 @@ for Idx = 1:length(vids)
             
             % Update display:
             Screen('Flip', window1);
-
+            if start < 10
+                io64(ioObj,address,dataOut); % send a signal
+                start = start + 1;
+            else
+                io64(ioObj,address,0); % stop signal
+            end
             % Release texture:
             Screen('Close', tex);
         end
-
+        io64(ioObj,address,0); % stop signal
         % Stop playback:
         Screen('PlayMovie', movie, 0);
 
@@ -125,12 +133,12 @@ for Idx = 1:length(vids)
     catch %#ok<CTCH>
         sca;
         psychrethrow(psychlasterror);
+        clear io64;
     end
     % Calculate image position (center of the screen)
     imageSize = [200 200 3];%size(smR);
     pos1 = [((W-imageSize(2))/2 - 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 - 300) ((H+imageSize(1))/2 + 300)];
     pos2 = [((W-imageSize(2))/2 + 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 + 300) ((H+imageSize(1))/2 + 300)];
-
 
     % Screen priority
     Priority(MaxPriority(window1));
@@ -152,13 +160,14 @@ for Idx = 1:length(vids)
         respTime = GetSecs;
         pressedKeys = find(keyCode);
                 
-%         % ESC key quits the experiment
-%         if keyCode(KbName('ESCAPE')) == 1
-%             clear all
-%             close all
-%             sca
-%             return;
-%         end
+        % ESC key quits the experiment
+        if keyCode(KbName('ESCAPE')) == 1
+            clear all
+            close all
+            clear io64;
+            sca
+            return;
+        end
         
         % Check for response keys
         if ~isempty(pressedKeys)
@@ -209,6 +218,7 @@ RestrictKeysForKbCheck([]);
 fclose(outputfile);
 Screen(window1,'Close');
 close all
+clear io64;
 sca;
 return
 
