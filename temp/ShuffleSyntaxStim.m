@@ -1,4 +1,4 @@
-function ShuffleSyntaxStim(subID)
+% function ShuffleSyntaxStim(subID)
 stim = readtable('stim\stimLSFsyntax.txt','Delimiter','\t');
 
 nBlocks = 8;
@@ -85,8 +85,12 @@ for block = 1:nBlocks
         else
             condVar = 1;
         end
-        for i = 2:height(newBlock)
-            if newBlockShuf.condition(i) == newBlockShuf.condition(i-1)
+        for i = 1:height(newBlock)
+            if i == 1 && length(newBlockShuf.condID{1}) == 3
+                qVar = 0;
+                break
+            end
+            if i > 1 && newBlockShuf.condition(i) == newBlockShuf.condition(i-1)
                 condVar = condVar + 1;
                 if condVar > maxCond
                     break
@@ -111,4 +115,4 @@ for block = 1:nBlocks
 end
 % clear i j k n q C iter block toPop
 save(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
-end
+% end

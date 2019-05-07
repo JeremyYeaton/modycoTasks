@@ -6,7 +6,7 @@
 % textFile = 'none';
 
 % Response keys (optional; for no subject response use empty list)
-responseKeys = {'space','f','j'};
+responseKeys = {'f','j','p'};
 %responseKeys = {};
 
 % Number of trials to show before a break (for no breaks, choose a number
@@ -34,6 +34,8 @@ trialTimeout = 10;
 % How long to pause in between trials (if 0, the experiment will wait for
 % the subject to press a key before every trial)
 timeBetweenTrials = 1;
+
+fixationDuration = 1; % Length of fixation in seconds
 
 % Response pictures
 smR = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\media\smileyRouge.jpg'));

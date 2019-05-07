@@ -1,4 +1,4 @@
-function runSLpresent(subID)
+function runSLpractice%(subID)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,21 +23,20 @@ W=rect(RectRight); % screen width
 H=rect(RectBottom); % screen height
 Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
-Priority(MaxPriority(window1));
+
+pauseText = 'Break time. Press space bar when you''re ready to continue';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ShuffleSyntaxStim(999)
 vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
 
-% Read in stimuli
-load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
+consignes = {'Consigne1-bonjour','Consigne 2','Consigne 3'};
+c2Bis = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\Consigne2bis.jpeg'));
 
-% Set up the output file
-resultsFolder = 'results';
-outputfile = fopen([resultsFolder '\resultfile_' num2str(subID) '.txt'],'a');
-fprintf(outputfile, 'subID\t trial\t videoFile\t questionFile\t response\t RT\n');
+% Read in stimuli
+% load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
+stimuli = readtable('stim\\stimLSFsyntaxPrac.txt','Delimiter','\t');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
@@ -49,22 +48,19 @@ Screen('Flip',window1)
 
 smRDisplay = Screen('MakeTexture', window1, smR);
 smVDisplay = Screen('MakeTexture', window1, smV);
+c2BisDisplay = Screen('MakeTexture', window1, c2Bis);
 
 % Wait for subject to press spacebar
 waitForSpace
 
-for Idx = 1:height(stimuli)
-    % Show fixation cross
-    fixationDuration = 1; % Length of fixation in seconds
-
-    moviename = [vidFolder, char(stimuli.fileID(Idx)), '.mp4'];
+for C = 1:length(consignes)
+    moviename = [vidFolder, consignes{C}, '.mp4'];
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     try
         % Open movie file:
         movie = Screen('OpenMovie', window1, moviename);
         frame = 0;
-        dataOut = stimuli.condition(Idx) * 50; % Define trigger value
 
         % Start playback engine:
         Screen('PlayMovie', movie, 1);
@@ -78,7 +74,83 @@ for Idx = 1:height(stimuli)
         % Play first frame
         tex = Screen('GetMovieImage', window1, movie);
         Screen('DrawTexture', window1, tex);
-%         io64(ioObj,address,dataOut); % send a signal
+        Screen('Flip', window1,tFixation + fixationDuration + slack,0);
+        
+        % Playback loop: Runs until end of movie or keypress:
+        while ~KbCheck
+            % Wait for next movie frame, retrieve texture handle to it
+            tex = Screen('GetMovieImage', window1, movie);
+
+            % Valid texture returned? A negative value means end of movie reached:
+            if tex<=0
+                % We're done, break out of loop:
+                break;
+            end
+
+            % Draw the new texture immediately to screen:
+            Screen('DrawTexture', window1, tex);
+            
+            % Update display:
+            Screen('Flip', window1);
+            % Release texture:
+            Screen('Close', tex);
+        end
+        % Stop playback:
+        Screen('PlayMovie', movie, 0);
+
+        % Close movie:
+        Screen('CloseMovie', movie);
+    catch %#ok<CTCH>
+        sca;
+        psychrethrow(psychlasterror);
+        clear io64;
+    end
+    Screen('DrawText',window1,'Appuie sur ESPACE pour continuer', (W/2-150), (H/2), textColor);
+    Screen('Flip',window1)
+    % Wait for subject to press spacebar
+    waitForSpace
+    if C == 1
+        % Calculate image position
+        imgDims = size(c2Bis);
+        imageSize = [2*imgDims(1) 2*imgDims(2) 3];
+        pos = [((W-imageSize(2))/2) ((H-imageSize(1))/2) ((W+imageSize(2))/2) ((H+imageSize(1))/2)];
+        KbReleaseWait;
+        Screen('DrawTexture', window1, c2BisDisplay, [], pos);
+        Screen('DrawText',window1,'Appuie sur ESPACE pour continuer', (W/2-150), (H/4)*3, textColor);
+        Screen('Flip',window1)
+        % Wait for subject to press spacebar
+        waitForSpace
+    end
+end
+KbReleaseWait;
+Screen('DrawText',window1,'You will now have a few practice trials. Press SPACE to begin.', (W/2-300), (H/2), textColor);
+Screen('Flip',window1)
+% Wait for subject to press spacebar
+waitForSpace
+
+% Practice trials
+for Idx = 1:height(stimuli)
+    moviename = [vidFolder, char(stimuli.fileID(Idx)), '.mp4'];
+    % Wait until user releases keys on keyboard:
+    KbReleaseWait;
+    try
+        % Open movie file:
+        movie = Screen('OpenMovie', window1, moviename);
+        frame = 0;
+        dataOut = stimuli.condition(Idx) * 50; % Define trigger valu
+
+        % Start playback engine:
+        Screen('PlayMovie', movie, 1);
+        
+        % Draw fixation cross; sync to video onset / trigger
+        drawCross(window1,W,H);
+        tFixation = Screen('Flip', window1);
+%         Screen(window1, 'FillRect', backgroundColor);
+        Screen('Flip', window1, tFixation + fixationDuration - slack,0);
+        
+        % Play first frame
+        tex = Screen('GetMovieImage', window1, movie);
+        Screen('DrawTexture', window1, tex);
         Screen('Flip', window1,tFixation + fixationDuration + slack,0);
         io64(ioObj,address,dataOut); % send a signal
         
@@ -99,7 +171,6 @@ for Idx = 1:height(stimuli)
             % Update display:
             Screen('Flip', window1);
             if frame < 12
-%                 io64(ioObj,address,dataOut); % send a signal
                 frame = frame + 1;
             elseif dataOut ~= 0
                 io64(ioObj,address,0); % stop signal
@@ -107,7 +178,6 @@ for Idx = 1:height(stimuli)
             % Release texture:
             Screen('Close', tex);
         end
-        io64(ioObj,address,0); % stop signal
         % Stop playback:
         Screen('PlayMovie', movie, 0);
 
@@ -118,6 +188,8 @@ for Idx = 1:height(stimuli)
         psychrethrow(psychlasterror);
         clear io64;
     end
+    io64(ioObj,address,0); % stop signal
+    pauseCheck(pauseText,window1,W,H,textColor)
     if length(char(stimuli.qFile(Idx))) > 1
         % Calculate image position
         imageSize = [200 200 3];
@@ -173,7 +245,6 @@ for Idx = 1:height(stimuli)
             psychrethrow(psychlasterror);
             clear io64;
         end
-
 %         % Screen priority
 %         Priority(MaxPriority(window1));
 %         Priority(2);
@@ -218,15 +289,20 @@ for Idx = 1:height(stimuli)
             end
         end
     end
-    % Save results to file
-    fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
-        subID, Idx, char(stimuli.fileID(Idx)), char(stimuli.qFile(Idx)), resp, rt);
+%     % Save results to file
+%     fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
+%         subID, Idx, char(stimuli.fileID(Idx)), char(stimuli.qFile(Idx)), resp, rt);
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
-        Screen('DrawText',window1,'Break time. Press space bar when you''re ready to continue', (W/2-300), (H/2), textColor);
+        Screen('DrawText',window1,pauseText, (W/2-300), (H/2), textColor);
         Screen('Flip',window1)
         % Wait for subject to press spacebar
-        waitForSpace
+        while 1
+            [keyIsDown,secs,keyCode] = KbCheck;
+            if keyCode(KbName('space')) == 1
+                break
+            end
+        end
     else
     % Pause between trials
         if timeBetweenTrials == 0
@@ -245,7 +321,7 @@ end
 %% End the experiment (don't change anything in this section)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 RestrictKeysForKbCheck([]);
-fclose(outputfile);
+% fclose(outputfile);
 Screen(window1,'Close');
 close all
 clear io64;
@@ -268,10 +344,20 @@ function drawCross(window,W,H)
 end
 
 function waitForSpace
+    KbReleaseWait;
     while 1
-        [keyIsDown,secs,keyCode] = KbCheck;
+        [~,~,keyCode] = KbCheck;
         if keyCode(KbName('space')) == 1
             break
         end
+    end
+end
+
+function pauseCheck(messageText,window,W,H,textColor)
+    [~,~,keyCode] = KbCheck;
+    if keyCode(KbName('p'))==1
+        Screen('DrawText',window,messageText, (W/2-300), (H/2), textColor);
+        Screen('Flip',window)
+        waitForSpace
     end
 end
