@@ -34,20 +34,14 @@ H=rect(RectBottom); % screen height
 Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
 
-file2 = 'MoDyCo'; % replace with question file later
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% vids = {'consigne1','consigne 2'};
-% vids = {'1C1','1C2','1C3'};
-vids = {};
-for cond = 1:10
-    for sent = 1:3
-        vids{length(vids) + 1} = [num2str(cond),' C',num2str(sent)];
-    end
-end
-        
-folder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
+ShuffleSyntaxStim(999)
+vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
+
+% Read in stimuli
+load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
 
 % Set up the output file
 resultsFolder = 'results';
@@ -64,8 +58,6 @@ Screen('Flip',window1)
 
 smRDisplay = Screen('MakeTexture', window1, smR);
 smVDisplay = Screen('MakeTexture', window1, smV);
-% img3 = 127*ones([200 200 3]);
-% blankDisplay = Screen('MakeTexture', window1, img3);
 
 % Wait for subject to press spacebar
 while 1
@@ -75,23 +67,11 @@ while 1
     end
 end
 
-for Idx = 1:length(vids)
+for Idx = 1:height(stimuli)
     % Show fixation cross
     fixationDuration = 1; % Length of fixation in seconds
-%     drawCross(window1,W,H);
-%     tFixation = Screen('Flip', window1);
-    
-    % Blank screen
-%     Screen(window1, 'FillRect', backgroundColor);
-%     Screen('Flip', window1, tFixation + fixationDuration - slack,0);
 
-    vid = vids{Idx};
-    moviename = [folder, vid, '.mp4'];
-%     if IsWin && ~IsOctave && psychusejava('jvm')
-%         fprintf('Running on Matlab for Microsoft Windows, with JVM enabled!\n');
-%         fprintf('This may crash. See ''help GStreamer'' for problem and workaround.\n');
-%         warning('Running on Matlab for Microsoft Windows, with JVM enabled!');
-%     end
+    moviename = [vidFolder, char(stimuli.fileID(Idx)), '.mp4'];
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     try
@@ -151,59 +131,59 @@ for Idx = 1:length(vids)
         psychrethrow(psychlasterror);
         clear io64;
     end
-    % Calculate image position (center of the screen)
-    imageSize = [200 200 3];%size(smR);
-    pos1 = [((W-imageSize(2))/2 - 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 - 300) ((H+imageSize(1))/2 + 300)];
-    pos2 = [((W-imageSize(2))/2 + 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 + 300) ((H+imageSize(1))/2 + 300)];
+    if length(char(stimuli.qFile(Idx))) > 1
+        % Calculate image position
+        imageSize = [200 200 3];
+        pos1 = [((W-imageSize(2))/2 - 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 - 300) ((H+imageSize(1))/2 + 300)];
+        pos2 = [((W-imageSize(2))/2 + 300) ((H-imageSize(1))/2 + 300) ((W+imageSize(2))/2 + 300) ((H+imageSize(1))/2 + 300)];
 
-    % Screen priority
-    Priority(MaxPriority(window1));
-    Priority(2);
-    % Show the images
-    rt = 0;
-    resp = 0;
-%     currentDisplay = 1;
-%     dur = imageDuration;
-    Screen(window1, 'FillRect', backgroundColor);
-    Screen('DrawTexture', window1, smRDisplay, [], pos1);
-    Screen('DrawTexture', window1, smVDisplay, [], pos2);
-    startTime = Screen('Flip', window1); % Start of trial
-%     Screen('DrawTexture', window1, blankDisplay, [], pos);
-    
-    % Get keypress response
-    while GetSecs - startTime < trialTimeout
-        [keyIsDown,secs,keyCode] = KbCheck;
-        respTime = GetSecs;
-        pressedKeys = find(keyCode);
-                
-        % ESC key quits the experiment
-        if keyCode(KbName('ESCAPE')) == 1
-            clear all
-            close all
-            clear io64;
-            sca
-            return;
-        end
-        
-        % Check for response keys
-        if ~isempty(pressedKeys)
-            for i = 1:length(responseKeys)
-                if KbName(responseKeys{i}) == pressedKeys(1)
-                    resp = responseKeys{i};
-                    rt = respTime - startTime;
-                end
+        % Screen priority
+        Priority(MaxPriority(window1));
+        Priority(2);
+        % Show the images
+        rt = 0;
+        resp = 0;
+        Screen(window1, 'FillRect', backgroundColor);
+        Screen('DrawTexture', window1, smRDisplay, [], pos1);
+        Screen('DrawTexture', window1, smVDisplay, [], pos2);
+        startTime = Screen('Flip', window1); % Start of trial
+    %     Screen('DrawTexture', window1, blankDisplay, [], pos);
+
+        % Get keypress response
+        while GetSecs - startTime < trialTimeout
+            [keyIsDown,secs,keyCode] = KbCheck;
+            respTime = GetSecs;
+            pressedKeys = find(keyCode);
+
+            % ESC key quits the experiment
+            if keyCode(KbName('ESCAPE')) == 1
+                clear all
+                close all
+                clear io64;
+                sca
+                return;
             end
-            drawCross(window1,W,H);
-            Screen('Flip', window1);
-        end
-        % Exit loop once a response is recorded
-        if rt > 0
-            break;
+
+            % Check for response keys
+            if ~isempty(pressedKeys)
+                for i = 1:length(responseKeys)
+                    if KbName(responseKeys{i}) == pressedKeys(1)
+                        resp = responseKeys{i};
+                        rt = respTime - startTime;
+                    end
+                end
+                drawCross(window1,W,H);
+                Screen('Flip', window1);
+            end
+            % Exit loop once a response is recorded
+            if rt > 0
+                break;
+            end
         end
     end
     % Save results to file
     fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
-        subID, Idx, vid, file2, resp, rt);
+        subID, Idx, char(stimuli.fileID(Idx)), char(stimuli.qFile(Idx)), resp, rt);
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
         Screen('DrawText',window1,'Break time. Press space bar when you''re ready to continue', (W/2-300), (H/2), textColor);
