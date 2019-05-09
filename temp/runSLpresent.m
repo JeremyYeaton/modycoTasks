@@ -8,7 +8,7 @@ rand('state', sum(100*clock)); % Initialize the random number generator
 
 % Keyboard setup
 KbName('UnifyKeyNames');
-KbCheckList = [KbName('space'),KbName('ESCAPE')];
+KbCheckList = [KbName('ESCAPE')]; % all space keypresses replaced with 'j'
 for i = 1:length(responseKeys)
     KbCheckList = [KbName(responseKeys{i}),KbCheckList];
 end
@@ -25,11 +25,13 @@ Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
 Priority(MaxPriority(window1));
 
+pauseText = 'Break time. Press space bar when you''re ready to continue';
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ShuffleSyntaxStim(999)
-vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
+vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videoSyntax\';
 
 % Read in stimuli
 load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
@@ -64,7 +66,9 @@ for Idx = 1:height(stimuli)
         % Open movie file:
         movie = Screen('OpenMovie', window1, moviename);
         frame = 0;
-        dataOut = stimuli.condition(Idx) * 50; % Define trigger value
+        dataOut = stimuli.condition(Idx) * 5; % Define onset trigger value
+        trigVal = stimuli.condition(Idx) * 50; % Define trigger value at sign
+        trigTime = round(stimuli.trigTimes(Idx) * framePerSec);
 
         % Start playback engine:
         Screen('PlayMovie', movie, 1);
@@ -98,11 +102,15 @@ for Idx = 1:height(stimuli)
             
             % Update display:
             Screen('Flip', window1);
-            if frame < 12
+            if frame < trigLen
 %                 io64(ioObj,address,dataOut); % send a signal
+                frame = frame + 1;
+            elseif frame >= trigTime && frame < trigTime + trigLen
+                io64(ioObj,address,trigVal); % send a signal
                 frame = frame + 1;
             elseif dataOut ~= 0
                 io64(ioObj,address,0); % stop signal
+                frame = frame + 1;
             end
             % Release texture:
             Screen('Close', tex);
@@ -118,6 +126,9 @@ for Idx = 1:height(stimuli)
         psychrethrow(psychlasterror);
         clear io64;
     end
+    pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
+    rt = 0;
+    resp = 0;
     if length(char(stimuli.qFile(Idx))) > 1
         % Calculate image position
         imageSize = [200 200 3];
@@ -159,7 +170,8 @@ for Idx = 1:height(stimuli)
                 Screen('DrawTexture', window1, tex);
                 
                 % Update display:
-                Screen('Flip', window1);
+                startTime = Screen('Flip', window1); % Start of trial
+%                 Screen('Flip', window1);
                 % Release texture:
                 Screen('Close', tex);
             end
@@ -178,12 +190,11 @@ for Idx = 1:height(stimuli)
 %         Priority(MaxPriority(window1));
 %         Priority(2);
         % Show the images
-        rt = 0;
-        resp = 0;
+        
         Screen(window1, 'FillRect', backgroundColor);
         Screen('DrawTexture', window1, smRDisplay, [], pos1);
         Screen('DrawTexture', window1, smVDisplay, [], pos2);
-        startTime = Screen('Flip', window1); % Start of trial
+%         startTime = Screen('Flip', window1); % Start of trial
     %     Screen('DrawTexture', window1, blankDisplay, [], pos);
 
         % Get keypress response
@@ -223,7 +234,7 @@ for Idx = 1:height(stimuli)
         subID, Idx, char(stimuli.fileID(Idx)), char(stimuli.qFile(Idx)), resp, rt);
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
-        Screen('DrawText',window1,'Break time. Press space bar when you''re ready to continue', (W/2-300), (H/2), textColor);
+        Screen('DrawText',window1,pauseText, (W/2-300), (H/2), textColor);
         Screen('Flip',window1)
         % Wait for subject to press spacebar
         waitForSpace
@@ -240,6 +251,7 @@ for Idx = 1:height(stimuli)
             WaitSecs(timeBetweenTrials);
         end
     end
+    pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End the experiment (don't change anything in this section)
@@ -270,8 +282,20 @@ end
 function waitForSpace
     while 1
         [keyIsDown,secs,keyCode] = KbCheck;
-        if keyCode(KbName('space')) == 1
+        if keyCode(KbName('j')) == 1
             break
         end
+    end
+end
+
+function pauseCheck(messageText,window,W,H,textColor,trigLenS,ioObj,address)
+    [keyIsDown,secs,keyCode] = KbCheck;
+    if keyCode(KbName('p'))==1
+        Screen('DrawText',window,messageText, (W/2-300), (H/2), textColor);
+        Screen('Flip',window)
+        io64(ioObj,address,255); % send a signal
+        pause(trigLenS);
+        io64(ioObj,address,0); % send a signal
+        waitForSpace
     end
 end

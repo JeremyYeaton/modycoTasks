@@ -1,4 +1,4 @@
-% function ShuffleSyntaxStim(subID)
+function ShuffleSyntaxStim(subID)
 stim = readtable('stim\stimLSFsyntax.txt','Delimiter','\t');
 
 nBlocks = 8;
@@ -46,13 +46,17 @@ end
 
 for block = 1:nBlocks
     newBlock = emptyTable;
+    fams = [];
     for C = 1:3
         toPop = [];
         for qIdx = 1:height(qTable)
             if strcmp(['C',num2str(C),'X'],char(qTable.condID(qIdx))) == 1
-                newBlock(height(newBlock)+1,:) = qTable(qIdx,:);
-                toPop(end + 1) = qIdx;
-                break
+                if ismember(qTable.family(qIdx),fams) == 0;
+                    newBlock(height(newBlock)+1,:) = qTable(qIdx,:);
+                    toPop(end + 1) = qIdx;
+                    fams(end + 1) = qTable.family(qIdx);
+                    break
+                end
             end
         end
         toPop = sort(toPop,'descend');
@@ -63,10 +67,13 @@ for block = 1:nBlocks
         for n = 1:6
             for q = 1:height(holding)
                 if strcmp(holding.condID(q),['C',num2str(C)]) == 1
-                    newBlock(height(newBlock)+1,:) = holding(q,:);
-                    toPop(end + 1) = q;
-                    holding(q,:) = [];
-                    break
+                    if ismember(holding.family(q),fams) == 0;
+                        newBlock(height(newBlock)+1,:) = holding(q,:);
+                        toPop(end + 1) = q;
+                        fams(end + 1) = holding.family(q);
+                        holding(q,:) = [];
+                        break
+                    end
                 end
             end
         end
@@ -115,4 +122,4 @@ for block = 1:nBlocks
 end
 % clear i j k n q C iter block toPop
 save(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
-% end
+end

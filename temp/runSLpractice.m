@@ -8,7 +8,7 @@ rand('state', sum(100*clock)); % Initialize the random number generator
 
 % Keyboard setup
 KbName('UnifyKeyNames');
-KbCheckList = [KbName('space'),KbName('ESCAPE')];
+KbCheckList = [KbName('ESCAPE')];
 for i = 1:length(responseKeys)
     KbCheckList = [KbName(responseKeys{i}),KbCheckList];
 end
@@ -26,13 +26,16 @@ Screen('Flip', window1);
 
 pauseText = 'Break time. Press space bar when you''re ready to continue';
 
+qTrigVal = 251;
+pauseVal = 255;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\';
+vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videoSyntax\';
 
 consignes = {'Consigne1-bonjour','Consigne 2','Consigne 3'};
-c2Bis = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videos\Consigne2bis.jpeg'));
+c2Bis = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videoSyntax\Consigne2bis.jpeg'));
 
 % Read in stimuli
 % load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
@@ -109,7 +112,7 @@ for C = 1:length(consignes)
     Screen('Flip',window1)
     % Wait for subject to press spacebar
     waitForSpace
-    if C == 1
+    if C == 2
         % Calculate image position
         imgDims = size(c2Bis);
         imageSize = [2*imgDims(1) 2*imgDims(2) 3];
@@ -208,7 +211,7 @@ for Idx = 1:height(stimuli)
             drawCross(window1,W,H);
             tFixation = Screen('Flip', window1);
             Screen('Flip', window1, tFixation + fixationDuration - slack,0);
-
+            io64(ioObj,address,qTrigVal); 
 %             % Play first frame
 %             tex = Screen('GetMovieImage', window1, movie);
 %             Screen('DrawTexture', window1, tex);
@@ -347,7 +350,7 @@ function waitForSpace
     KbReleaseWait;
     while 1
         [~,~,keyCode] = KbCheck;
-        if keyCode(KbName('space')) == 1
+        if keyCode(KbName('j')) == 1
             break
         end
     end
@@ -358,6 +361,9 @@ function pauseCheck(messageText,window,W,H,textColor)
     if keyCode(KbName('p'))==1
         Screen('DrawText',window,messageText, (W/2-300), (H/2), textColor);
         Screen('Flip',window)
+        io64(ioObj,address,255); % send a signal
+        pause(trigLen * (1/framePerSec));
+        io64(ioObj,address,0); % send a signal
         waitForSpace
     end
 end

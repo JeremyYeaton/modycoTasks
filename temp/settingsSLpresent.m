@@ -46,3 +46,8 @@ ioObj = io64;
 status = io64(ioObj)
 address = hex2dec('4FD8'); 
 io64(ioObj,address,0); % set signal to 0
+
+% Video settings
+framePerSec = 25;
+trigLen = 12; % in frames
+trigLenS = trigLen * (1 / framePerSec); % in seconds
