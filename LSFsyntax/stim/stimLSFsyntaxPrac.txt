@@ -1,0 +1,5 @@
+fileID	condition	question 	qFile	condID
+31 C1	1	X	Q31fille	C1X
+10 C2	2			C2
+25 C2	2	X	Q75partir	C2X
+3 C3	3			C3

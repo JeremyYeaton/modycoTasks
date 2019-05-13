@@ -1,5 +1,5 @@
 fileID	trigTimes	family	condition	question 	qFile	repCorr	condID
-1 C1	6.017	1 	1	X	Q1film	repCorr	C1X
+1 C1	6.017	1 	1	X	Q1film	j	C1X
 1 C2	6.190	1 	2			j	C2
 1 C3	4.982	1 	3			j	C3
 2 C1	7.408	2 	1			j	C1

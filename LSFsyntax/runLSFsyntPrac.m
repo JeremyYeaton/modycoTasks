@@ -1,9 +1,9 @@
-function runSLpractice%(subID)
+function runLSFsyntPrac
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-settingsSLpresent; % Load all the settings from the file
+settingsLSFsyntax; % Load all the settings from the file
 rand('state', sum(100*clock)); % Initialize the random number generator
 
 % Keyboard setup
@@ -16,7 +16,7 @@ RestrictKeysForKbCheck(KbCheckList);
 
 % Screen setup
 clear screen
-whichScreen = max(Screen('Screens'));
+whichScreen = 1;%max(Screen('Screens'));
 [window1, rect] = Screen('Openwindow',whichScreen,backgroundColor,[],[],2);
 slack = Screen('GetFlipInterval', window1)/2;
 W=rect(RectRight); % screen width
@@ -32,10 +32,10 @@ pauseVal = 255;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-vidFolder = 'C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videoSyntax\';
+vidFolder = [expDir,'\videos\'];
 
 consignes = {'Consigne1-bonjour','Consigne 2','Consigne 3'};
-c2Bis = imread(fullfile('C:\Users\AdminS2CH\Desktop\Experiments\modycoTasks\temp\videoSyntax\Consigne2bis.jpeg'));
+c2Bis = imread(fullfile([expDir,'\videos\Consigne2bis.jpeg']));
 
 % Read in stimuli
 stimuli = readtable('stim\\stimLSFsyntaxPrac.txt','Delimiter','\t');
