@@ -164,6 +164,55 @@ for block = 1:nBlocks
     stimuli = [stimuli; newBlockShuf];
     carryOver = condVar;
     carryQ = qVar;
+%         b = 0;
+%         blocShuf = Shuffle(1:height(newBlock));
+%         newBlockShuf = newBlock(blocShuf,:);
+% %         while strcmp(newBlockShuf.question{1},'X')
+% %             disp('Oh dear')
+% %             blocShuf = Shuffle(1:height(newBlock));
+% %             newBlockShuf = newBlock(blocShuf,:);
+% %         end
+% %         if block == 1
+% % %             for iter = 1:2
+% % %                 if strcmp(newBlockShuf.question{iter},'X')
+% % %                     breakVar = 0;
+% % %                     break
+% % %                 end
+% % %             end
+% %         elseif block > 1 && newBlockShuf.condition(1) == stimuli.condition(end)
+% %             condVar = carryOver + 1;
+% %         else
+% %             condVar = 1;
+% %         end
+%         for i = 1:height(newBlock)
+%             if i == 1 && ~strcmp(newBlockShuf.question{i},'X')
+%                 qVar = 0;
+%                 b = b + 1;
+%                 break
+% %             elseif i > 1 && newBlockShuf.condition(i) == newBlockShuf.condition(i-1)
+% %                 condVar = condVar + 1;
+% %                 if condVar > maxCond
+% %                     break
+% %                 end
+% %             else
+% %                 condVar = 1;
+%             end
+% %             if strcmp(newBlockShuf.question{i},'X')
+% %                 if qVar < minQ && qVar > 0
+% %                     qVar = 1;
+% %                     break
+% %                 end
+% %                 qVar = 1;
+% %             else
+% %                 qVar = qVar + 1;
+% %             end
+%             qVar = qVar + 1;
+%         end
+%     end
+%     stimuli = [stimuli; newBlockShuf];
+%     carryOver = condVar;
+%     carryQ = qVar;
+%     b
 end
 save(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
 end

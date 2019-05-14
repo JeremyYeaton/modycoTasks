@@ -10,7 +10,7 @@ responseKeys = {'f','j','p'};
 
 % Number of trials to show before a break (for no breaks, choose a number
 % greater than the number of trials in your experiment)
-breakAfterTrials = 4;
+breakAfterTrials = 25;
 
 % Background color: choose a number from 0 (black) to 255 (white)
 backgroundColor = 0;
@@ -40,3 +40,5 @@ io64(ioObj,address,0); % set signal to 0
 framePerSec = 25;
 trigLen = 12; % in frames
 trigLenS = trigLen * (1 / framePerSec); % in seconds
+
+pauseText = 'Pause. Appuyez sur le bouton vert pour continuer.';

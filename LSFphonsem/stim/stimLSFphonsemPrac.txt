@@ -1,0 +1,5 @@
+fileID	condition	question 	qFile1	qFile2	repCorr
+C123	1				
+C320	3				
+C104	1	X	4-ville	4-nature	4-nature
+C129	1	X	29-comedien	29-sel	29-comedien
