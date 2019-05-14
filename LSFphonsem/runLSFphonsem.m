@@ -30,7 +30,7 @@ Priority(MaxPriority(window1));
 vidFolder = [expDir,'\videos\'];
 
 % Create shuffled stimuli list
-% ShufflePhonSemStim(subID);
+ShufflePhonSemStim(subID);
 
 % Read in stimuli
 load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
@@ -230,7 +230,12 @@ for Idx = 1:height(stimuli)
                     if KbName(responseKeys{i}) == pressedKeys(1)
                         resp = responseKeys{i};
                         rt = respTime - startTime;
-                        if strcmp(KbName(pressedKeys(1)),stimuli.repCorr(Idx))
+                        if strcmp(stimuli.qFile1{Idx},stimuli.repCorr{Idx})
+                            qRep = 'f';
+                        else
+                            qRep = 'j';
+                        end
+                        if strcmp(KbName(pressedKeys(1)),qRep)
                             repSignal = 200;
                         else
                             repSignal = 1;

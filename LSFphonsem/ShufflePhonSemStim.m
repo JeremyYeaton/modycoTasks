@@ -3,12 +3,10 @@ stim = readtable('stim\stimLSFphonsem.txt','Delimiter','\t');
 
 % Set parameters and variables
 nBlocks = 5;
-iPerBlock = 24;
 minQ = 6;
 maxCond = 3;
 qVar = 1; condVar = maxCond + 1;
 nCond = 5;
-breakVar = 1;
 
 % Initialize holding tables for questions and items
 emptyTable = stim(1,:); emptyTable(1,:) = [];
@@ -68,6 +66,7 @@ for i = 1:nBlocks
     end
 end
 %%%%
+carryQ = 0;
 for block = 1:nBlocks
     newBlock = emptyTable;
     fams = [];
