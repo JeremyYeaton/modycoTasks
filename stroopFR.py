@@ -20,8 +20,8 @@ Vars = {'g':['VERT',xpy.misc.constants.C_GREEN],
 		'y': ['JAUNE',xpy.misc.constants.C_YELLOW]
 		}
 
-n_scrambles = [10,10,5]
-n_scrambles = 3
+n_scrambles = [10,10,2,2]
+#n_scrambles = 3
 repNums = [100,102,106,107]
 repKeys = ['D','F','J','K']
 a = [key for key in Vars.keys()]
@@ -50,7 +50,7 @@ for c1 in [key for key in wordDict]:
 	for c2 in [key for key in Vars]:
 		clrTrials.append(''.join([c1,c2]))
 
-trial_types = [['gR','rR','bR','yR'], ['gW','rW','bW','yW'], clrTrials]
+trial_types = [['gR','rR','bR','yR'], ['gW','rW','bW','yW'], clrTrials, clrTrials]
 
 #for tType in clrTrials:
 #	trial_types[3].append(tType)
@@ -88,6 +88,10 @@ appuyer sur la touche qui correspond à la couleur dans laquelle le mot est écr
 Par exemple, si le mot JAUNE est écrit en rouge, tu dois appuyer sur la couleur rouge.\n
 Appuie sur ESPACE pour continuer."""
 
+pauseText = """Tu peux prendre une pause si tu veux.
+
+Appuie sur ESPACE quand tu veux continuer."""
+
 sendOff = """Tres bien!\n\n 
 Appuie sur ESPACE pour commencer."""
 
@@ -95,7 +99,7 @@ retryTxt = """Pas exactement. Rappel:
 %s, appuie sur D.\n %s, appuie sur F.\n %s, appuie sur J\n %s, appuie sur K.\n\n 
 Appuie sur ESPACE pour ressayer."""%keyAssign
 
-instr = [rectInstr, txtInstr, cTxtInstr]
+instr = [rectInstr, txtInstr, cTxtInstr,pauseText]
 
 def instrTrial(Instructions,block_name):
 	trial_name = xpy.design.Trial()
@@ -182,7 +186,7 @@ def keyPresent():
 	repKeyVars[2].present(clear = False,update = False)
 	repKeyVars[3].present(clear = False,update = False)
 	
-blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2]
+blockNames = ["IntroRect",0,"IntroBW",1,"IntroClr",2,"Pause",3]
 instrNum = 0
 
 for blck in blockNames:
@@ -193,9 +197,11 @@ for blck in blockNames:
 		instrTrial(repere,Block)
 		exp.add_block(Block)
 		instrNum += 1
-	elif type(blck) == int:
-		addBlock(blck,n_scrambles, prac = 1)
-		addBlock(blck, n_scrambles)
+	elif type(blck) == int and blck < 3:
+		addBlock(blck,2, prac = 1)
+		addBlock(blck, n_scrambles[blck])
+	else:
+		addBlock(blck, n_scrambles[blck])
 
 def presentInstr(blockNum):
 	for block in exp.blocks[blockNum:blockNum + 1]:

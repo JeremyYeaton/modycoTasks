@@ -14,7 +14,7 @@ exp = xpy.design.Experiment(name="Navon")
 xpy.control.initialize(exp)
 
 
-n_scrambles = 1
+n_scrambles = 2
 
 '''
 implement practice
