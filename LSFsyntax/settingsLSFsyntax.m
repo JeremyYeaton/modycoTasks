@@ -11,13 +11,13 @@ responseKeys = {'f','j','p'};
 
 % Number of trials to show before a break (for no breaks, choose a number
 % greater than the number of trials in your experiment)
-breakAfterTrials = 4;
+breakAfterTrials = 22;
 
 % Background color: choose a number from 0 (black) to 255 (white)
-backgroundColor = 0;
+backgroundColor = [139 139 131];
 
 % Text color: choose a number from 0 (black) to 255 (white)
-textColor = 230;
+textColor = 0;
 
 % How long to wait (in seconds) for subject response before the trial times out
 trialTimeout = 10;
@@ -42,3 +42,5 @@ io64(ioObj,address,0); % set signal to 0
 framePerSec = 25;
 trigLen = 12; % in frames
 trigLenS = trigLen * (1 / framePerSec); % in seconds
+
+pauseText = 'Pause. Appuyez sur le bouton vert pour continuer.';

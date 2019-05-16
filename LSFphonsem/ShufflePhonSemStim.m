@@ -163,6 +163,7 @@ for block = 1:nBlocks
     stimuli = [stimuli; newBlockShuf];
     carryOver = condVar;
     carryQ = qVar;
+    qVar = 1; condVar = maxCond + 1;
 end
 save(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
 end

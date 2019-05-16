@@ -45,7 +45,7 @@ stimuli = readtable('stim\\stimLSFsyntaxPrac.txt','Delimiter','\t');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Start screen
-Screen('DrawText',window1,'Press the space bar to begin', (W/2-150), (H/2), textColor);
+Screen('DrawText',window1,'Appuyez sur le bouton vert pour commencer.', (W/2-250), (H/2), textColor);
 Screen('Flip',window1)
 
 smRDisplay   = Screen('MakeTexture', window1, smR);
@@ -107,7 +107,7 @@ for C = 1:length(consignes)
         psychrethrow(psychlasterror);
         clear io64;
     end
-    Screen('DrawText',window1,'Appuie sur ESPACE pour continuer', (W/2-150), (H/2), textColor);
+    Screen('DrawText',window1,'Appuyez sur le bouton vert pour continuer', (W/2-150), (H/2), textColor);
     Screen('Flip',window1)
     % Wait for subject to press spacebar
     waitForSpace
@@ -118,14 +118,14 @@ for C = 1:length(consignes)
         pos = [((W-imageSize(2))/2) ((H-imageSize(1))/2) ((W+imageSize(2))/2) ((H+imageSize(1))/2)];
         KbReleaseWait;
         Screen('DrawTexture', window1, c2BisDisplay, [], pos);
-        Screen('DrawText',window1,'Appuie sur ESPACE pour continuer', (W/2-150), (H/4)*3, textColor);
+        Screen('DrawText',window1,'Appuyez sur le bouton vert pour continuer', (W/2-150), (H/4)*3, textColor);
         Screen('Flip',window1)
         % Wait for subject to press spacebar
         waitForSpace
     end
 end
 KbReleaseWait;
-Screen('DrawText',window1,'You will now have a few practice trials. Press SPACE to begin.', (W/2-300), (H/2), textColor);
+Screen('DrawText',window1,'Vous allez maintenant avoir un entrainement. Appuyez sur le bouton vert pour commencer.', (W/2-500), (H/2), textColor);
 Screen('Flip',window1)
 % Wait for subject to press spacebar
 waitForSpace

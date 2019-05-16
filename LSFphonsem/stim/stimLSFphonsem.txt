@@ -2,10 +2,10 @@ fileID	trigTimes	family	condition	question 	qFile1	qFile2	repCorr
 C101	1.836	01	1	X	1-boisson	1-transport	1-boisson
 C102	1.902	02	1				
 C103	4.805	03	1	X	3-sport	3-couture	3-sport
-C105	9.848	05	1				
+C105	10.611	05	1				
 C106	3.841	06	1	X	6-vetement	6-saison	6-saison
 C108	5.005	08	1				
-C109	3.070	09	1	X	9-voyage	9-animaux	9-animaux
+C109	3.104	09	1	X	9-voyage	9-animaux	9-animaux
 C110	2.136	10	1	X	10-ordinateur	10-conte	10-conte
 C111	3.471	11	1	X	11-mer	11-dieu	11-mer
 C112	3.337	12	1				
@@ -17,7 +17,7 @@ C117	3.804	17	1	X	17-transport	17-sandwich
 C118	3.671	18	1				
 C119	2.002	19	1				
 C120	5.339	20	1				
-C121	4.205	21	1	X	21-geographie	21-chimie	21-geographie
+C121	4.238	21	1	X	21-geographie	21-chimie	21-geographie
 C122	4.538	22	1	X	22-travail	22-nourriture	22-nourriture
 C124	4.805	24	1				
 C125	2.570	25	1				
@@ -67,7 +67,7 @@ C214	4.705	14	2
 C216	2.937	16	2				
 C217	3.170	17	2				
 C218	2.570	18	2				
-C219	1.302	19	2				
+C219	1.335	19	2				
 C220	5.072	20	2				
 C221	3.838	21	2				
 C222	4.305	22	2				
@@ -128,7 +128,7 @@ C323	2.303	23	3
 C324	4.472	24	3				
 C325	2.370	25	3				
 C326	2.837	26	3				
-C327	6.907	27	3				
+C327	6.874	27	3				
 C328	3.637	28	3				
 C329	2.269	29	3				
 C330	4.605	30	3				
@@ -224,7 +224,7 @@ C516	2.870	16	5
 C517	3.838	17	5				
 C518	2.370	18	5				
 C519	1.602	19	5				
-C520	5.506	20	5				
+C520	5.473	20	5				
 C521	3.070	21	5				
 C522	3.671	22	5				
 C523	2.203	23	5				

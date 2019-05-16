@@ -46,7 +46,7 @@ fprintf(outputfile, 'subID\t trial\t videoFile\t questionFile1\t questionFile2\t
 
 % Start screen
 Screen(window1, 'FillRect', darkBlue);
-Screen('DrawText',window1,'Appuyez sur le bouton vert pour commencer.', (W/2-150), (H/2), textColor);
+Screen('DrawText',window1,'Appuyez sur le bouton vert pour commencer.', (W/2-250), (H/2), textColor);
 Screen('Flip',window1);
 
 drawCross(window1,W,H);

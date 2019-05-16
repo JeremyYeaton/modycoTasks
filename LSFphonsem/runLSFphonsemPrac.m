@@ -305,9 +305,17 @@ for Idx = 1:height(stimuli)
                     if KbName(responseKeys{i}) == pressedKeys(1)
                         resp = responseKeys{i};
                         rt = respTime - startTime;
-                        if strcmp(KbName(pressedKeys(1)),repCorr)
-                            break
+                        if strcmp(stimuli.qFile1{Idx},stimuli.repCorr{Idx})
+                            qRep = 'f';
+                        else
+                            qRep = 'j';
                         end
+                        if strcmp(KbName(pressedKeys(1)),qRep)
+                            repSignal = 200;
+                        else
+                            repSignal = 1;
+                        end
+                        io64(ioObj,address,repSignal);
 %                         if strcmp(KbName(pressedKeys(1)),stimuli.repCorr(Idx))
 %                             repSignal = 200;
 %                         else
