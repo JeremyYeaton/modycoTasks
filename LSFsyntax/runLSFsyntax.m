@@ -47,7 +47,7 @@ fprintf(outputfile, 'subID\t trial\t videoFile\t questionFile\t response\t RT\n'
 
 % Start screen
 Screen('DrawText',window1,'Appuyez sur le bouton vert pour commencer.', (W/2-200), (H/2), textColor);
-Screen('Flip',window1)
+Screen('Flip',window1);
 
 smRDisplay = Screen('MakeTexture', window1, smR);
 smVDisplay = Screen('MakeTexture', window1, smV);

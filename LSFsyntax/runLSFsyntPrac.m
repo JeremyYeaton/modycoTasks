@@ -108,7 +108,7 @@ for C = 1:length(consignes)
         clear io64;
     end
     Screen('DrawText',window1,'Appuyez sur le bouton vert pour continuer', (W/2-150), (H/2), textColor);
-    Screen('Flip',window1)
+    Screen('Flip',window1);
     % Wait for subject to press spacebar
     waitForSpace
     if C == 2
@@ -119,7 +119,7 @@ for C = 1:length(consignes)
         KbReleaseWait;
         Screen('DrawTexture', window1, c2BisDisplay, [], pos);
         Screen('DrawText',window1,'Appuyez sur le bouton vert pour continuer', (W/2-150), (H/4)*3, textColor);
-        Screen('Flip',window1)
+        Screen('Flip',window1);
         % Wait for subject to press spacebar
         waitForSpace
     end
