@@ -1,9 +1,0 @@
-Weight	Nested	Procedure	wav\prime.wav	wav\target.wav	condition	conditionDetail	correctResponse
-1		ExpProc	wav\livre.wav	wav\cahier.wav	1	Spo	j
-1		ExpProc	wav\cousin.wav	wav\tante.wav	1	Spo	j
-1		ExpProc	wav\mère.wav	wav\père.wav	1	Spo	j
-1		ExpProc	wav\table.wav	wav\chaise.wav	1	Spo	j
-1		ExpProc	wav\fille.wav	wav\semaine.wav	4	spo	f
-1		ExpProc	wav\porte.wav	wav\kiwi.wav	4	spo	f
-1		ExpProc	wav\feuille.wav	wav\chambre.wav	4	spo	f
-1		ExpProc	wav\boutille.wav	wav\écouteur.wav	4	spo	f

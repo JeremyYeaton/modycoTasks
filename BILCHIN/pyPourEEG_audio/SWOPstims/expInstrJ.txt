@@ -1,3 +1,0 @@
-Weight	Nested	Procedure	Instruction
-1		InstrProc	S'il y a un lien sémantique entre les deux mots, appuyez sur "J". \n S'il n'y a pas de lien sémantique entre les deux mots, appuyez sur "F". \n\n Appuyez sur la barre ESPACE pour commencer.
-1		InstrProc	Nous allons commencer par quelques essais.\n\n Appuyez sur la barre ESPACE pour commencer.

@@ -1,4 +1,0 @@
-Weight	Nested	Procedure	stimulussentence	condition	label	CriticalWord	repCorr
-1		trialprocedure	Ibland äter jag godis.	2	?	3	s
-1		trialprocedure	Igår hon reste till Spanien.	1	?	2	l
-1		trialprocedure	Hemma myser jag gärna.	1	?	2	l
