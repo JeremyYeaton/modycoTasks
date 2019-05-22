@@ -1,0 +1,6 @@
+Weight	Nested	Procedure	prime	target	condition	correctResponse
+1		ExpProc	audio\01.wav	audio\01.wav	spoA	f
+1		ExpProc	audio\02.wav	audio\02.wav	spoA	f
+1		ExpProc	audio\02.wav	audio\02.wav	spoA	f
+1		ExpProc	audio\02.wav	audio\02.wav	spoA	f
+1		ExpProc	audio\02.wav	audio\02.wav	spoA	f

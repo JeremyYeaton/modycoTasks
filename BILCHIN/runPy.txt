@@ -1,0 +1,4 @@
+ipython
+import os
+os.chdir('F:\BILCHIN\pyPourEEG_visuel')     =====OU====    os.chdir('F:\BILCHIN\pyPourEEG_audio')
+run 1_stimShuffle.py

@@ -9,7 +9,7 @@ import expyriment as xpy, numpy.random as rnd, copy
 
 subNum = int(input("Subject number: "))
 
-xpy.control.set_develop_mode(True)
+#xpy.control.set_develop_mode(True)
 exp = xpy.design.Experiment(name="Navon")
 xpy.control.initialize(exp)
 
