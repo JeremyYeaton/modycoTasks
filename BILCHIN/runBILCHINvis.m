@@ -32,8 +32,11 @@ Priority(MaxPriority(window1));
 % Create shuffled stimuli list
 % ShuffleBILCHINStim(subID,'vis')
 
+fixationDuration = .5 + (.75-.5).*rand(100,2);
+
 % Read in stimuli
-load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
+% load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
+load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
 
 % Set up the output file
 resultsFolder = 'results';
@@ -54,15 +57,12 @@ waitForSpace(ioObj,address)
 
 for Idx = 1:height(stimuli)
 %     disp(['Trial ',num2str(Idx),': ',stimuli.prime(Idx,'-',stimuli.target(Idx)])
-    % Show fixation cross
-    fixationDuration = .5; % Length of fixation in seconds
-
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     % Cross 500
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1);
-    Screen('Flip', window1, tFixation + fixationDuration - slack,0);
+    Screen('Flip', window1, tFixation + fixationDuration(Idx,1) - slack,0);
     % Blank 200
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1);
@@ -74,7 +74,7 @@ for Idx = 1:height(stimuli)
     Screen('Flip', window1,word + .5 - slack,0);
     % Blank 600
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1,tBlank + .6 - slack,0);
+    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
     Screen('Flip', window1,tBlank + .6 - slack,0);
     % Target 500
 %     Screen('DrawText',window1,stimuli.target{Idx}, (W/2), (H/2), textColor);

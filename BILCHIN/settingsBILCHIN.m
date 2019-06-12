@@ -7,15 +7,6 @@ cd(expDir);
 
 % Response keys (optional; for no subject response use empty list)
 responseKeys = {'f','j','p'};
-% Uneven participants: 1,0; even: 0,1
-if even
-    reps = fj
-else
-    reps = jf
-    
-if actual repsonse = f & subid even & repcorr is 1
-    correct
-
 
 % Number of trials to show before a break (for no breaks, choose a number
 % greater than the number of trials in your experiment)
