@@ -1,4 +1,4 @@
-function runBILCHINvis(subID)
+function runBILCHINaud(subID)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -25,15 +25,19 @@ Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
 Priority(MaxPriority(window1));
 
+% Audio setup
+device = [];
+InitializePsychSound;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up stimuli lists and results file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Create shuffled stimuli list
-% ShuffleBILCHINStim(subID,'vis')
+% ShuffleBILCHINStim(subID,'aud')
 
 % Read in stimuli
-load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
+load(['stim\\shuffledStim_',num2str(subID),'_aud.mat'],'stimuli')
 
 % Set up the output file
 resultsFolder = 'results';
@@ -54,40 +58,68 @@ waitForSpace(ioObj,address)
 
 for Idx = 1:height(stimuli)
 %     disp(['Trial ',num2str(Idx),': ',stimuli.prime(Idx,'-',stimuli.target(Idx)])
-    % Show fixation cross
-    fixationDuration = .5; % Length of fixation in seconds
-
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     % Cross 500
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1);
-    Screen('Flip', window1, tFixation + fixationDuration - slack,0);
-    % Blank 200
+    % Present prime
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Read WAV file from filesystem:
+    wavfilename = [expDir,'\\wav\\',stimuli.prime{Idx},'.wav'];
+    [y, freq] = psychwavread(wavfilename);
+    wavedata = y';
+    nrchannels = size(wavedata,1); % Number of rows == number of channels.
+    if nrchannels < 2
+        wavedata = [wavedata ; wavedata];
+        nrchannels = 2;
+    end
+    pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
+    % Fill the audio playback buffer with the audio data 'wavedata':
+    PsychPortAudio('FillBuffer', pahandle, wavedata);
+    
+    drawCross(window1,W,H);
+    tFixation = Screen('Flip', window1,tFixation + fixationDuration - slack,0);
+    io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
+    PsychPortAudio('Start', pahandle, repetitions, 0, 1);
+    % Blank screen
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1);
-    Screen('Flip', window1,tBlank + .2 - slack,0);
-    % Present prime 500
-%     Screen('DrawText',window1,stimuli.prime{Idx}, (W/2), (H/2), textColor);
-    DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
-    word = Screen('Flip', window1);
-    Screen('Flip', window1,word + .5 - slack,0);
-    % Blank 600
-    Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1,tBlank + .6 - slack,0);
-    Screen('Flip', window1,tBlank + .6 - slack,0);
+    tBlank = Screen('Flip', window1, tFixation + stimDuration - slack,0);
+    % Stop playback:
+    PsychPortAudio('Stop', pahandle);
     % Target 500
-%     Screen('DrawText',window1,stimuli.target{Idx}, (W/2), (H/2), textColor);
-    DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
-    startTime = Screen('Flip', window1);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Read WAV file from filesystem:
+    wavfilename = [expDir,'\\wav\\',stimuli.target{Idx},'.wav'];
+    [y, freq] = psychwavread(wavfilename);
+    wavedata = y';
+    nrchannels = size(wavedata,1); % Number of rows == number of channels.
+    if nrchannels < 2
+        wavedata = [wavedata ; wavedata];
+        nrchannels = 2;
+    end
+    
+    % Try with the 'freq'uency we wanted:
+    pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
+    % Fill the audio playback buffer with the audio data 'wavedata':
+    PsychPortAudio('FillBuffer', pahandle, wavedata);
+    drawCross(window1,W,H);
+    startTime = Screen('Flip', window1,tBlank + ISI - slack,0);
+    PsychPortAudio('Start', pahandle, repetitions, 0, 1);
+    % 
+    io64(ioObj,address,stimuli.condition(Idx)*10) % UPDATE
     rt = 0;
     resp = 0;
+    while ~KbCheck && GetSecs - startTime < stimDuration
+        PsychPortAudio('GetStatus', pahandle);
+    end
     if ~KbCheck
-        Screen('Flip', window1,startTime + .5 - slack,0);
+        Screen('Flip', window1,startTime + stimDuration - slack,0);
         DrawFormattedText(window1,'?', 'center','center', textColor);
         Screen('Flip', window1);
     end
-    
+    % Stop playback:
+    PsychPortAudio('Stop', pahandle);
     % Response
     % Get keypress response
     while GetSecs - startTime < trialTimeout
@@ -108,8 +140,8 @@ for Idx = 1:height(stimuli)
         if ~isempty(pressedKeys)
             for i = 1:length(responseKeys)
                 if KbName(responseKeys{i}) == pressedKeys(1)
-                    resp = responseKeys{i}
-                    rt = respTime - startTime
+                    resp = responseKeys{i};
+                    rt = respTime - startTime;
 %                     if strcmp(KbName(pressedKeys(1)),stimuli.repCorr(Idx))
 %                         repSignal = 200;
 %                     else
@@ -118,7 +150,8 @@ for Idx = 1:height(stimuli)
 %                     io64(ioObj,address,repSignal);
                 end
             end
-            drawCross(window1,W,H);
+            % Blank screen
+            Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
         % Exit loop once a response is recorded
@@ -153,6 +186,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 RestrictKeysForKbCheck([]);
 fclose(outputfile);
+PsychPortAudio('Close', pahandle);
 Screen(window1,'Close');
 close all
 clear io64;

@@ -4,11 +4,12 @@ import os, csv, random
 # os.chdir('F:\\BILCHIN\\pyPourEEG_read')
 
 #%%
-catLabels = ["SpoA","SpoB","sPo","spO","spoA","spoB"]  
+catLabels = ["SpoA","SpoB","sPo","spO","spoA","spoB"]
 #conditionNb: 	1,		1,	2,		3,		4,	4
 subNum = int(input("Subject number: "))
 
 nLists = 3
+maxRep = 3 # Maximum number of the same response allowed in a row
 
 # #### CHOOSE FROM DIFFERNT CONDITIONS
 # # Assign list number to even/odd subjects
@@ -46,12 +47,13 @@ f = open(''.join(['SWOPstims\\stimList.txt']),'r')
 g = csv.reader(f,delimiter = '\t')
 # Assign correct reponses to items
 allItems = []
+skip = 0
 for line in g:
 	if line[-1] == '0': # Condition column: 1 = Linked, 0 = Non-Linked
 		line[-1] = responses[0]
 	elif line[-1] == '1':
 		line[-1] = responses[1]
-	if subNum % 2 == 1:
+	if subNum % 2 == 1 and skip == 1:
 		newLine = [[],[],[],[],[],[],[],[]]
 		# newLine = line
 		newLine[0] = line[0]
@@ -64,10 +66,28 @@ for line in g:
 		newLine[7] = line[7]
 		line = newLine
 	allItems.append(line)
+	skip = 1
+
+#### new def
+def checkRepeats(block,inarow,col):
+	for i, sent in enumerate(block):
+		if i == 0:
+			pass
+		elif sent[col] == block[i-1][col]:
+			inarow += 1
+		else:
+			inarow = 1
+		if inarow > maxRep:
+			break
+	return inarow
+
 
 # Shuffle
 random.shuffle(allItems) # Shuffle all the sentences
 newStim = []
+## new def demands this
+rpt,rptRep,carryOver = maxRep + 1,maxRep + 1, 1
+
 for block in range(30): # 6 categories x 30 blocks = 180 items
 	currBlock = []
 	# For each block, find the first sentence with the desired category and append to block
@@ -82,10 +102,27 @@ for block in range(30): # 6 categories x 30 blocks = 180 items
 		for j in toPop: # Remove items that have been put in blocks
 			allItems.pop(j)
 	random.shuffle(currBlock)
-	while block > 0 and newStim[-1][-2] ==  currBlock[0][-2]: # -2 : conditionDetail
+	# while block > 0 and newStim[-1][-2] ==  currBlock[0][-2]: # -2 : conditionDetail
+	# 	random.shuffle(currBlock)
+	while rpt > maxRep or rptRep > maxRep:
 		random.shuffle(currBlock)
+		if block > 0 and newStim[-1][5] == currBlock[0][5]:
+			rpt = checkRepeats(currBlock, carryOver + 1,5)
+		else:
+			rpt = checkRepeats(currBlock, 1,5)
+		if block > 0 and newStim[-1][7] == currBlock[0][7]:
+			rptRep = checkRepeats(currBlock, carryOverRep + 1,7)
+		else:
+			rptRep = checkRepeats(currBlock, 1,7)
+
 	for sent in currBlock:
 		newStim.append(sent) # Add sentences to stimulus list
+
+### new def demands this
+	carryOver = rpt
+	carryOverRep = rptRep
+	rpt = maxRep + 1
+	rptRep = maxRep + 1
 # Save text files and subject flag
 f.close()
 # f = open(''.join(['SWOPstims\\stimTextFiles\\SUBJECT',str(subNum),'.txt']),'w')

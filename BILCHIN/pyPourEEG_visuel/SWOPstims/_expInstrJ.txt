@@ -1,3 +1,0 @@
-Weight	Nested	Procedure	Instruction
-1		InstrProc	If it's good, press J.\n If it's bad, press F\n\n Appuyez sur ESPACE pour continuer.
-1		InstrProc	You're gonna do some practice now.\n\n Appuyez sur ESPACE pour continuer.

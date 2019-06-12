@@ -1,3 +1,0 @@
-Les étapes :
-1- go to 'run.txt' and fun python script to randomize stimuli
-2- 
