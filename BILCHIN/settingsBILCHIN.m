@@ -25,8 +25,8 @@ trialTimeout = 5;
 % the subject to press a key before every trial)
 timeBetweenTrials = .2;
 
-fixationDuration = .7; % Length of fixation in seconds
-stimDuration = 1;
+stimDurationAud = 1;
+stimDurationVis = 0.5;
 ISI = 0.6;
 
 repetitions = 1;

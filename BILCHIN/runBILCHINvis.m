@@ -16,11 +16,11 @@ RestrictKeysForKbCheck(KbCheckList);
 
 % Screen setup
 clear screen
-whichScreen = max(Screen('Screens'));%1;%
+whichScreen     = max(Screen('Screens'));%1;%
 [window1, rect] = Screen('Openwindow',whichScreen,backgroundColor,[],[],2);
-slack = Screen('GetFlipInterval', window1)/2;
-W=rect(RectRight); % screen width
-H=rect(RectBottom); % screen height
+slack           = Screen('GetFlipInterval', window1)/2;
+W               = rect(RectRight); % screen width
+H               = rect(RectBottom); % screen height
 Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
 Priority(MaxPriority(window1));
@@ -32,11 +32,11 @@ Priority(MaxPriority(window1));
 % Create shuffled stimuli list
 % ShuffleBILCHINStim(subID,'vis')
 
-fixationDuration = .5 + (.75-.5).*rand(100,2);
-
 % Read in stimuli
 % load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
 load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
+
+fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
 
 % Set up the output file
 resultsFolder = 'results';
@@ -49,7 +49,6 @@ fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t RT\n');
 
 % Start screen
 DrawFormattedText(window1,'Appuyez sur ESPACE pour commencer.', 'center','center', textColor);
-% Screen('DrawText',window1,'Appuyez sur ESPACE pour commencer.', (W/2-200), (H/2), textColor);
 Screen('Flip',window1);
 Screen('TextSize', window1,76);
 % Wait for subject to press spacebar
@@ -68,25 +67,28 @@ for Idx = 1:height(stimuli)
     tBlank = Screen('Flip', window1);
     Screen('Flip', window1,tBlank + .2 - slack,0);
     % Present prime 500
-%     Screen('DrawText',window1,stimuli.prime{Idx}, (W/2), (H/2), textColor);
     DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
     word = Screen('Flip', window1);
     Screen('Flip', window1,word + .5 - slack,0);
     % Blank 600
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
-    Screen('Flip', window1,tBlank + .6 - slack,0);
+    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,1) - slack,0);
     % Target 500
-%     Screen('DrawText',window1,stimuli.target{Idx}, (W/2), (H/2), textColor);
     DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
-    startTime = Screen('Flip', window1);
+    startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
     rt = 0;
     resp = 0;
-    if ~KbCheck
-        Screen('Flip', window1,startTime + .5 - slack,0);
-        DrawFormattedText(window1,'?', 'center','center', textColor);
-        Screen('Flip', window1);
+    while ~KbCheck && GetSecs - startTime < stimDurationVis
+        PsychPortAudio('GetStatus', pahandle);
     end
+    respToBeMade = true;
+     while respToBeMade
+        [keyIsDown,secs, keyCode] = KbCheck;
+        if isempty(find(keyCode, 1))
+            Screen('Flip', window1,startTime + .5 - slack,0);
+            DrawFormattedText(window1,'?', 'center','center', textColor);
+            Screen('Flip', window1);
+        end
     
     % Response
     % Get keypress response
@@ -108,8 +110,8 @@ for Idx = 1:height(stimuli)
         if ~isempty(pressedKeys)
             for i = 1:length(responseKeys)
                 if KbName(responseKeys{i}) == pressedKeys(1)
-                    resp = responseKeys{i}
-                    rt = respTime - startTime
+                    resp = responseKeys{i};
+                    rt = respTime - startTime;
 %                     if strcmp(KbName(pressedKeys(1)),stimuli.repCorr(Idx))
 %                         repSignal = 200;
 %                     else

@@ -110,11 +110,12 @@ for Idx = 1:height(stimuli)
     io64(ioObj,address,stimuli.condition(Idx)*10) % UPDATE
     rt = 0;
     resp = 0;
-    while ~KbCheck && GetSecs - startTime < stimDuration
+    %%%% WORK ON THIS PART -- break on keypress/ don't show question mark%%%%
+    while ~KbCheck && GetSecs - startTime < stimDurationAud
         PsychPortAudio('GetStatus', pahandle);
     end
     if ~KbCheck
-        Screen('Flip', window1,startTime + stimDuration - slack,0);
+        Screen('Flip', window1,startTime + stimDurationAud - slack,0);
         DrawFormattedText(window1,'?', 'center','center', textColor);
         Screen('Flip', window1);
     end
