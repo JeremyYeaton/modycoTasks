@@ -45,41 +45,45 @@ for i = 1:nBlocks
 end
 
 for block = 1:nBlocks
-    newBlock = emptyTable;
-    fams = [];
-    for C = 1:3
-        toPop = [];
-        for qIdx = 1:height(qTable)
-            if strcmp(['C',num2str(C),'X'],char(qTable.condID(qIdx))) == 1
-                if ismember(qTable.family(qIdx),fams) == 0;
-                    newBlock(height(newBlock)+1,:) = qTable(qIdx,:);
-                    toPop(end + 1) = qIdx;
-                    fams(end + 1) = qTable.family(qIdx);
-                    break
-                end
-            end
-        end
-        toPop = sort(toPop,'descend');
-        for k = toPop
-            qTable(k,:) = [];
-        end
-        toPop = [];
-        for n = 1:6
-            for q = 1:height(holding)
-                if strcmp(holding.condID(q),['C',num2str(C)]) == 1
-                    if ismember(holding.family(q),fams) == 0;
-                        newBlock(height(newBlock)+1,:) = holding(q,:);
-                        toPop(end + 1) = q;
-                        fams(end + 1) = holding.family(q);
-                        holding(q,:) = [];
+    if block < nBlocks
+        newBlock = emptyTable;
+        fams = [];
+        for C = 1:3
+            toPop = [];
+            for qIdx = 1:height(qTable)
+                if strcmp(['C',num2str(C),'X'],char(qTable.condID(qIdx))) == 1
+                    if ismember(qTable.family(qIdx),fams) == 0;
+                        newBlock(height(newBlock)+1,:) = qTable(qIdx,:);
+                        toPop(end + 1) = qIdx;
+                        fams(end + 1) = qTable.family(qIdx);
                         break
                     end
                 end
             end
+            toPop = sort(toPop,'descend');
+            for k = toPop
+                qTable(k,:) = [];
+            end
+            toPop = [];
+            for n = 1:6
+                for q = 1:height(holding)
+                    if strcmp(holding.condID(q),['C',num2str(C)]) == 1
+                        if ismember(holding.family(q),fams) == 0;
+                            newBlock(height(newBlock)+1,:) = holding(q,:);
+                            toPop(end + 1) = q;
+                            fams(end + 1) = holding.family(q);
+                            holding(q,:) = [];
+                            break
+                        end
+                    end
+                end
+            end
         end
+        newBlock(height(newBlock)+1,:) = shufStim(1,:);
+        shufStim(1,:) = [];
+    else
+        newBlock = [holding;qTable;shufStim];
     end
-    newBlock(height(newBlock)+1,:) = shufStim(1,:);
-    shufStim(1,:) = [];
     % Run checks to make sure questions qre not too close together and not
     % too many of the same condition appear in a row
     
