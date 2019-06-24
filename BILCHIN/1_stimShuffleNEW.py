@@ -24,10 +24,10 @@ if subNum % 4 < 2:  # ex. sujet 1,sujet 4
 else: # ex. sujet 2,sujet 3
 	responses = ['j','f'] # notlinked, linked
 # Open practice stim file
-f = open('SWOPstims\\practice.txt','r')
+f = open('visualStim\\practice.txt','r')
 g = csv.reader(f,delimiter = '\t')
 # h = open('SWOPstims/stimTextFiles/practiceBlock.txt','w')
-h = open('SWOPstims\\stimTextFiles\\practiceBlock.txt','w')
+h = open('visualStim\\stimTextFiles\\practiceBlock.txt','w')
 for line in g:
     if line[-1] == '0': # Condition column: 0 = notLinked ; 1  = linked
         line[-1] = responses[0]
@@ -43,7 +43,7 @@ h.close()
 #f = open(''.join(['ERP_stims\\stimList',str(listNum),'.txt']),'r')
 # f = open(''.join(['SWOPstims\\stimList',str(listNum),'.txt']),'r')
 # f = open(''.join(['SWOPstims/stimList.txt']),'r')
-f = open(''.join(['SWOPstims\\stimList.txt']),'r')
+f = open(''.join(['visualStim\\stimList.txt']),'r')
 g = csv.reader(f,delimiter = '\t')
 # Assign correct reponses to items
 allItems = []
@@ -132,7 +132,7 @@ totItems = len(newStim)
 iPerList = int(totItems / nLists)
 
 for listNum in range(1, nLists + 1):
-	f = open(''.join(['SWOPstims\\stimTextFiles\\stimBlock',str(listNum),'.txt']),'w')
+	f = open(''.join(['visualStim\\stimTextFiles\\stimBlock',str(listNum),'.txt']),'w')
 	f.write('\t'.join(allItems[0]))
 	f.write('\n')
 	start = (listNum-1)*(iPerList)
@@ -144,7 +144,7 @@ f.close()
 
 # Save trial order for subject
 # f = open(''.join(['SWOPstims/subjectStims/ajtTrialOrderSub',str(subNum),'.txt']),'w')
-f = open(''.join(['SWOPstims\\subjectStims\\ajtTrialOrderSub',str(subNum),'.txt']),'w')
+f = open(''.join(['stim\\TrialOrderSub',str(subNum),'.txt']),'w')
 for line in newStim:
 	f.write('\t'.join(line))
 	f.write('\n')
@@ -152,11 +152,11 @@ f.close()
 
 # Save instructions
 if responses[0] == 'f':
-    f = open('SWOPstims\\expInstrJ.txt','r')
+    f = open('visualStim\\expInstrJ.txt','r')
 else:
-    f = open('SWOPstims\\expInstrF.txt','r')
+    f = open('visualStim\\expInstrF.txt','r')
 g = csv.reader(f,delimiter = '\t')
-f2 = open(''.join(['SWOPstims\\stimTextFiles\\expInstr',str(subNum),'.txt']),'w')
+f2 = open(''.join(['visualStim\\stimTextFiles\\expInstr',str(subNum),'.txt']),'w')
 
 for line in g:
 	f2.write('\t'.join(line))
