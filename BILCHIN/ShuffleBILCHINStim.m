@@ -1,14 +1,14 @@
-function ShuffleBILCHINStim(subID,modality)
+function ShuffleBILCHINStim(subID,modality,reps)
 % stimuli = readtable('stim\rawStimBILCHINtest.txt','Delimiter','\t');
 system(['python stimShuffleBILCHIN.py ',num2str(subID)]);
 stimuli = readtable(['stim\TrialOrderSub',num2str(subID),'.txt'],'Delimiter','\t');
 stimuli.correctResponse = num2str(stimuli.correctResponse);
 
-if mod(subID,2) == 0
-    reps = {'f','j'};
-else
-    reps = {'j','f'};
-end
+% if mod(subID,2) == 0
+%     reps = {'f','j'};
+% else
+%     reps = {'j','f'};
+% end
 for i = 1:height(stimuli)
     if stimuli.correctResponse(i) == '0'
         stimuli.correctResponse(i) = reps{1};

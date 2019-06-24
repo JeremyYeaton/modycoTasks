@@ -15,10 +15,10 @@ maxRep = 3 # Maximum number of the same response allowed in a row
 # #### CHOOSE FROM DIFFERNT CONDITIONS
 
 # Assign response category to alternate every 2 participants
-if subNum % 4 < 2:  # ex. sujet 1,sujet 4
-	responses = ['f','j'] # notlinked, linked
-else: # ex. sujet 2,sujet 3
-	responses = ['j','f'] # notlinked, linked
+# if subNum % 4 < 2:  # ex. sujet 1,sujet 4
+# 	responses = ['f','j'] # notlinked, linked
+# else: # ex. sujet 2,sujet 3
+# 	responses = ['j','f'] # notlinked, linked
 # Open practice stim file
 f = open('visualStim\\practice.txt','r')
 g = csv.reader(f,delimiter = '\t')

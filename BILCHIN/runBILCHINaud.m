@@ -34,7 +34,12 @@ InitializePsychSound;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Create shuffled stimuli list
-ShuffleBILCHINStim(subID,'aud')
+if mod(subID,2) == 0
+    reps = {'f','j'};
+else
+    reps = {'j','f'};
+end
+ShuffleBILCHINStim(subID,'vis',reps)
 
 % Read in stimuli
 load(['stim\\shuffledStim_',num2str(subID),'_aud.mat'],'stimuli')
@@ -58,6 +63,24 @@ Screen('Flip',window1);
 Screen('TextSize', window1,76);
 % Wait for subject to press spacebar
 waitForSpace(ioObj,address)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Instructions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Screen('TextSize', window1,48);
+DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
+Screen('Flip',window1);
+% Wait for subject to press spacebar
+waitForSpace(ioObj,address)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Practice
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Real task
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for Idx = 1:height(stimuli)
     disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
