@@ -84,7 +84,7 @@ for block = 1:nBlocks
     else
         newBlock = [holding;qTable;shufStim];
     end
-    % Run checks to make sure questions qre not too close together and not
+    % Run checks to make sure questions are not too close together and not
     % too many of the same condition appear in a row
     
     disp(['Shuffling block ', num2str(block)])

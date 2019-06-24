@@ -1,4 +1,4 @@
-prime	target	condition	conditionDetail	correctResponse
+colA	colB	condition	conditionDetail	correctResponse
 amande	noix	1	SpoA	1
 voile	table	4	spoA	0
 tasse	assiette	1	SpoB	1

@@ -16,7 +16,7 @@ RestrictKeysForKbCheck(KbCheckList);
 
 % Screen setup
 clear screen
-whichScreen = max(Screen('Screens'));%1;%
+whichScreen = 1;%max(Screen('Screens'));%1;%
 [window1, rect] = Screen('Openwindow',whichScreen,backgroundColor,[],[],2);
 slack = Screen('GetFlipInterval', window1)/2;
 W=rect(RectRight); % screen width
@@ -34,10 +34,13 @@ InitializePsychSound;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Create shuffled stimuli list
-% ShuffleBILCHINStim(subID,'aud')
+ShuffleBILCHINStim(subID,'aud')
 
 % Read in stimuli
 load(['stim\\shuffledStim_',num2str(subID),'_aud.mat'],'stimuli')
+
+% Initialize fixation duration vectors
+fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
 
 % Set up the output file
 resultsFolder = 'results';
@@ -57,13 +60,13 @@ Screen('TextSize', window1,76);
 waitForSpace(ioObj,address)
 
 for Idx = 1:height(stimuli)
-%     disp(['Trial ',num2str(Idx),': ',stimuli.prime(Idx,'-',stimuli.target(Idx)])
+    disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     % Cross 500
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1);
-    % Present prime
+    % Present prime 1000 ms
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
     wavfilename = [expDir,'\\wav\\',stimuli.prime{Idx},'.wav'];
@@ -74,20 +77,21 @@ for Idx = 1:height(stimuli)
         wavedata = [wavedata ; wavedata];
         nrchannels = 2;
     end
+    % Initialize audio player
     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
     % Fill the audio playback buffer with the audio data 'wavedata':
     PsychPortAudio('FillBuffer', pahandle, wavedata);
-    
+    % Display fixation cross for ~500 ms
     drawCross(window1,W,H);
-    tFixation = Screen('Flip', window1,tFixation + fixationDuration - slack,0);
-    io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
-    PsychPortAudio('Start', pahandle, repetitions, 0, 1);
+    tFixation = Screen('Flip', window1,tFixation + fixationDuration(Idx,1) - slack,0);
+    PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Begin audio
+    io64(ioObj,address,stimuli.condition(Idx)*5) % Send trigger
     % Blank screen
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1, tFixation + stimDuration - slack,0);
+    tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    % Target 500
+    % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
     wavfilename = [expDir,'\\wav\\',stimuli.target{Idx},'.wav'];
@@ -98,23 +102,24 @@ for Idx = 1:height(stimuli)
         wavedata = [wavedata ; wavedata];
         nrchannels = 2;
     end
-    
-    % Try with the 'freq'uency we wanted:
+    % Initialize audio player
     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
     % Fill the audio playback buffer with the audio data 'wavedata':
     PsychPortAudio('FillBuffer', pahandle, wavedata);
+    % Display fixation cross for ~500 ms
     drawCross(window1,W,H);
-    startTime = Screen('Flip', window1,tBlank + ISI - slack,0);
-    PsychPortAudio('Start', pahandle, repetitions, 0, 1);
-    % 
-    io64(ioObj,address,stimuli.condition(Idx)*10) % UPDATE
+    startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
+    PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Start audio
+    io64(ioObj,address,stimuli.condition(Idx)*10) % Send trigger
     rt = 0;
     resp = 0;
     %%%% WORK ON THIS PART -- break on keypress/ don't show question mark%%%%
     while ~KbCheck && GetSecs - startTime < stimDurationAud
         PsychPortAudio('GetStatus', pahandle);
     end
-    if ~KbCheck
+    io64(ioObj,address,0)
+    [~,~,keyCode] = KbCheck;
+    if isempty(find(keyCode, 1))
         Screen('Flip', window1,startTime + stimDurationAud - slack,0);
         DrawFormattedText(window1,'?', 'center','center', textColor);
         Screen('Flip', window1);

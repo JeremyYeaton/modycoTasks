@@ -27,7 +27,6 @@ timeBetweenTrials = .2;
 
 stimDurationAud = 1;
 stimDurationVis = 0.5;
-ISI = 0.6;
 
 repetitions = 1;
 
@@ -37,4 +36,4 @@ status = io64(ioObj)
 address = hex2dec('4FD8'); 
 io64(ioObj,address,0); % set signal to 0
 
-pauseText = 'Pause. Appuyez sur le bouton vert pour continuer.';
+pauseText = 'Pause. Appuyez sur ESPACE pour continuer.';

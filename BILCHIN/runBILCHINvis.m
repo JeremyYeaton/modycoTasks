@@ -16,7 +16,7 @@ RestrictKeysForKbCheck(KbCheckList);
 
 % Screen setup
 clear screen
-whichScreen     = max(Screen('Screens'));%1;%
+whichScreen     = 1;%max(Screen('Screens'));%1;%
 [window1, rect] = Screen('Openwindow',whichScreen,backgroundColor,[],[],2);
 slack           = Screen('GetFlipInterval', window1)/2;
 W               = rect(RectRight); % screen width
@@ -30,12 +30,13 @@ Priority(MaxPriority(window1));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Create shuffled stimuli list
-% ShuffleBILCHINStim(subID,'vis')
+ShuffleBILCHINStim(subID,'vis')
 
 % Read in stimuli
 % load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
-load(['stim\\shuffledStim_',num2str(subID),'.mat'],'stimuli')
+load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
 
+% Initialize fixation duration vectors
 fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
 
 % Set up the output file
@@ -55,7 +56,7 @@ Screen('TextSize', window1,76);
 waitForSpace(ioObj,address)
 
 for Idx = 1:height(stimuli)
-%     disp(['Trial ',num2str(Idx),': ',stimuli.prime(Idx,'-',stimuli.target(Idx)])
+    disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
     % Cross 500
@@ -65,35 +66,36 @@ for Idx = 1:height(stimuli)
     % Blank 200
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1);
-    Screen('Flip', window1,tBlank + .2 - slack,0);
+    io64(ioObj,address,0)
     % Present prime 500
     DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
-    word = Screen('Flip', window1);
-    Screen('Flip', window1,word + .5 - slack,0);
-    % Blank 600
+    word = Screen('Flip', window1,tBlank + .2 - slack);
+    io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
+    tBlank = Screen('Flip', window1,word + .5 - slack,0);
+    % Blank 600(ish)
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,1) - slack,0);
+    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
+    io64(ioObj,address,0)
     % Target 500
     DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
+    io64(ioObj,address,stimuli.condition(Idx)*10) % UPDATE
     rt = 0;
     resp = 0;
-    while ~KbCheck && GetSecs - startTime < stimDurationVis
-        PsychPortAudio('GetStatus', pahandle);
+    while ~KbCheck && (GetSecs - startTime) < stimDurationVis
     end
-    respToBeMade = true;
-     while respToBeMade
-        [keyIsDown,secs, keyCode] = KbCheck;
-        if isempty(find(keyCode, 1))
-            Screen('Flip', window1,startTime + .5 - slack,0);
-            DrawFormattedText(window1,'?', 'center','center', textColor);
-            Screen('Flip', window1);
-        end
+    io64(ioObj,address,0)
+    [~,~,keyCode] = KbCheck;
+    % If no response in 500 ms, show question mark
+    if isempty(find(keyCode, 1))
+        Screen('Flip', window1,startTime + stimDurationVis - slack,0);
+        DrawFormattedText(window1,'?', 'center','center', textColor);
+        Screen('Flip', window1);
+    end
     
-    % Response
     % Get keypress response
     while GetSecs - startTime < trialTimeout
-        [keyIsDown,secs,keyCode] = KbCheck;
+        [~,~,keyCode] = KbCheck;
         respTime = GetSecs;
         pressedKeys = find(keyCode);
 
@@ -105,19 +107,18 @@ for Idx = 1:height(stimuli)
             sca
             return;
         end
-
         % Check for response keys
         if ~isempty(pressedKeys)
             for i = 1:length(responseKeys)
                 if KbName(responseKeys{i}) == pressedKeys(1)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
-%                     if strcmp(KbName(pressedKeys(1)),stimuli.repCorr(Idx))
-%                         repSignal = 200;
-%                     else
-%                         repSignal = 1;
-%                     end
-%                     io64(ioObj,address,repSignal);
+                    if strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx))
+                        repSignal = 200;
+                    else
+                        repSignal = 1;
+                    end
+                    io64(ioObj,address,repSignal);
                 end
             end
             drawCross(window1,W,H);
@@ -128,7 +129,7 @@ for Idx = 1:height(stimuli)
             break;
         end
     end
-
+    pauseCheck(pauseText,window1,textColor,ioObj,address)
     % Save results to file
     fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
         num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, rt);
@@ -178,7 +179,7 @@ end
 
 function waitForSpace(ioObj,address)
     while 1
-        [keyIsDown,secs,keyCode] = KbCheck;
+        [~,~,keyCode] = KbCheck;
         if keyCode(KbName('SPACE')) == 1
             io64(ioObj,address,0);
             KbReleaseWait;
@@ -187,14 +188,16 @@ function waitForSpace(ioObj,address)
     end
 end
 
-function pauseCheck(messageText,window,W,H,textColor,ioObj,address)
-    [keyIsDown,secs,keyCode] = KbCheck;
-    if keyCode(KbName('p'))==1
-        Screen('DrawText',window,messageText, (W/2-300), (H/2), textColor);
+function pauseCheck(messageText,window,textColor,ioObj,address)
+    [~,~,keyCode] = KbCheck;
+    Screen('TextSize', window,32);
+    if keyCode(KbName('p')) == 1
+        DrawFormattedText(window,messageText,'center','center',textColor);
         Screen('Flip',window)
         io64(ioObj,address,255); % send a signal
         pause(.5);
         io64(ioObj,address,0); % send a signal
         waitForSpace(ioObj,address)
     end
+    Screen('TextSize', window,76);
 end
