@@ -26,4 +26,19 @@ else
 end
 
 save(['stim\\shuffledStim_',num2str(subID),'_',modality,'.mat'],'stimuli')
+
+% Input correct responses for practice trials
+stimuli = readtable('stim\practice.txt','Delimiter','\t');
+stimuli.correctResponse = num2str(stimuli.correctResponse);
+shufIdx = shuffle(1:height(stimuli));
+stimuli = stimuli(shufIdx,:);
+
+for i = 1:height(stimuli)
+    if stimuli.correctResponse(i) == '0'
+        stimuli.correctResponse(i) = reps{1};
+    else
+        stimuli.correctResponse(i) = reps{2};
+    end
+end
+save(['stim\\practice.mat'],'stimuli')
 end

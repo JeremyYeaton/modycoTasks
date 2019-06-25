@@ -31,15 +31,15 @@ Priority(MaxPriority(window1));
 
 % Create shuffled stimuli list
 if mod(subID,2) == 0
-    reps = {'F','J'};
+    reps = {'f','j'};
 else
-    reps = {'J','F'};
+    reps = {'j','f'};
 end
 ShuffleBILCHINStim(subID,'vis',reps)
 
 % Read in stimuli
-% load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
 load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
+taskStim = stimuli;
 
 % Initialize fixation duration vectors
 fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
@@ -47,7 +47,7 @@ fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
 % Set up the output file
 resultsFolder = 'results';
 outputfile = fopen([resultsFolder '\resultfile_' num2str(subID) '.txt'],'a');
-fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t RT\n');
+fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t Acc\t RT\n');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
@@ -73,7 +73,7 @@ waitForSpace(ioObj,address)
 %% Practice
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,76); % Make the font big
-
+load('stim\\practice.mat','stimuli')
 for Idx = 1:height(stimuli)
     disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
     % Wait until user releases keys on keyboard:
@@ -90,10 +90,9 @@ for Idx = 1:height(stimuli)
     DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
     word = Screen('Flip', window1,tBlank + .2 - slack);
     io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
-    tBlank = Screen('Flip', window1,word + .5 - slack,0);
     % Blank 600(ish)
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
+    tBlank = Screen('Flip', window1,word + fixationDuration(Idx,2) - slack,0);
     io64(ioObj,address,0)
     % Target 500
     DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
@@ -110,11 +109,14 @@ for Idx = 1:height(stimuli)
         Screen('Flip', window1,startTime + stimDurationVis - slack,0);
         DrawFormattedText(window1,'?', 'center','center', textColor);
         Screen('Flip', window1);
+        [~,~,keyCode] = KbCheck;
     end
     
     % Get keypress response
     while GetSecs - startTime < trialTimeout
-        [~,~,keyCode] = KbCheck;
+        if isempty(find(keyCode, 1))
+            [~,~,keyCode] = KbCheck;
+        end
         respTime = GetSecs;
         pressedKeys = find(keyCode);
 
@@ -132,7 +134,8 @@ for Idx = 1:height(stimuli)
                 if KbName(responseKeys{i}) == pressedKeys(1)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
-                    if strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx))
+                    ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
+                    if ACC
                         repSignal = 200;
                     else
                         repSignal = 1;
@@ -149,9 +152,6 @@ for Idx = 1:height(stimuli)
         end
     end
     pauseCheck(pauseText,window1,textColor,ioObj,address)
-    % Save results to file
-    fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
-        num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, rt);
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
         KbReleaseWait;
@@ -164,13 +164,14 @@ for Idx = 1:height(stimuli)
         if timeBetweenTrials == 0
             waitForSpace(ioObj,address)
         else
+            
             WaitSecs(timeBetweenTrials);
         end
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
     io64(ioObj,address,0);
 end
-
+%% Send off to the real task
 Screen('TextSize', window1,48); % Make the font big
 DrawFormattedText(window1,'Appuyez sur ESPACE pour commencer.', 'center','center', textColor);
 Screen('Flip',window1);
@@ -179,7 +180,7 @@ waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Real task
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-load(['stim\\shuffledStim_',num2str(subID),'_vis.mat'],'stimuli')
+stimuli = taskStim;
 
 % Initialize fixation duration vectors
 fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
@@ -200,10 +201,9 @@ for Idx = 1:height(stimuli)
     DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
     word = Screen('Flip', window1,tBlank + .2 - slack);
     io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
-    tBlank = Screen('Flip', window1,word + .5 - slack,0);
     % Blank 600(ish)
     Screen(window1, 'FillRect', backgroundColor);
-    tBlank = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
+    tBlank = Screen('Flip', window1,word + fixationDuration(Idx,2) - slack,0);
     io64(ioObj,address,0)
     % Target 500
     DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
@@ -242,7 +242,8 @@ for Idx = 1:height(stimuli)
                 if KbName(responseKeys{i}) == pressedKeys(1)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
-                    if strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx))
+                    ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
+                    if ACC
                         repSignal = 200;
                     else
                         repSignal = 1;
@@ -260,8 +261,8 @@ for Idx = 1:height(stimuli)
     end
     pauseCheck(pauseText,window1,textColor,ioObj,address)
     % Save results to file
-    fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
-        num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, rt);
+    fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\t %f\n',...
+        num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, ACC, rt);
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
         KbReleaseWait;
