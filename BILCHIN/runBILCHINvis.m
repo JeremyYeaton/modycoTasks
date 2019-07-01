@@ -62,8 +62,8 @@ waitForSpace(ioObj,address)
 %% Instructions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,48);
-DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
-'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+DrawFormattedText(window1,['S''il y a un lien sÃ©mantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sÃ©mantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
 'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
 Screen('Flip',window1);
 % Wait for subject to press spacebar
@@ -106,9 +106,10 @@ for Idx = 1:height(stimuli)
     [~,~,keyCode] = KbCheck;
     % If no response in 500 ms, show question mark
     if isempty(find(keyCode, 1))
-        Screen('Flip', window1,startTime + stimDurationVis - slack,0);
+%         Screen('Flip', window1,startTime + stimDurationVis - slack,0);
         DrawFormattedText(window1,'?', 'center','center', textColor);
-        Screen('Flip', window1);
+        Screen('Flip', window1,startTime + stimDurationVis - slack,0);
+%         Screen('Flip', window1);
         [~,~,keyCode] = KbCheck;
     end
     
@@ -143,7 +144,8 @@ for Idx = 1:height(stimuli)
                     io64(ioObj,address,repSignal);
                 end
             end
-            drawCross(window1,W,H);
+            % Blank screen
+            Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
         % Exit loop once a response is recorded
