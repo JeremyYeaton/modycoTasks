@@ -288,12 +288,13 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    % Response
+
     % Get keypress response
     while GetSecs - startTime < trialTimeout
-        if isempty(find(keyCode, 1))
+        % Uncomment if statements
+        %if isempty(find(keyCode, 1))
             [~,~,keyCode] = KbCheck;
-        end
+        %end
         respTime = GetSecs;
         pressedKeys = find(keyCode);
 
@@ -322,7 +323,7 @@ for Idx = 1:height(stimuli)
                 end
             end
             % Blank screen
-            Screen(window1, 'FillRect', backgroundColor);
+            drawCross(window1,W,H);
             Screen('Flip', window1);
         end
         % Exit loop once a response is recorded
