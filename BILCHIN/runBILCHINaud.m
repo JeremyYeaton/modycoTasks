@@ -282,9 +282,11 @@ for Idx = 1:height(stimuli)
     io64(ioObj,address,0)
     [~,~,keyCode] = KbCheck;
     if isempty(find(keyCode, 1))
-        Screen('Flip', window1,startTime + stimDurationAud - slack,0);
+%         Screen('Flip', window1,startTime + stimDurationVis - slack,0);
         DrawFormattedText(window1,'?', 'center','center', textColor);
-        Screen('Flip', window1);
+        Screen('Flip', window1,startTime + stimDurationVis - slack,0);
+%         Screen('Flip', window1);
+        [~,~,keyCode] = KbCheck;
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
@@ -323,7 +325,7 @@ for Idx = 1:height(stimuli)
                 end
             end
             % Blank screen
-            drawCross(window1,W,H);
+            Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
         % Exit loop once a response is recorded
@@ -331,7 +333,7 @@ for Idx = 1:height(stimuli)
             break;
         end
     end
-
+    pauseCheck(pauseText,window1,textColor,ioObj,address)
     % Save results to file
     fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\t %f\n',...
         num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, ACC, rt);
