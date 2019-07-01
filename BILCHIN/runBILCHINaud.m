@@ -39,7 +39,7 @@ if mod(subID,2) == 0
 else
     reps = {'j','f'};
 end
-ShuffleBILCHINStim(subID,'vis',reps)
+ShuffleBILCHINStim(subID,'aud',reps)
 
 % Read in stimuli
 load(['stim\\shuffledStim_',num2str(subID),'_aud.mat'],'stimuli')
@@ -68,8 +68,8 @@ waitForSpace(ioObj,address)
 %% Instructions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,48);
-DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
-'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+DrawFormattedText(window1,['S''il y a un lien sÃ©mantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sÃ©mantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
 'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
 Screen('Flip',window1);
 % Wait for subject to press spacebar
