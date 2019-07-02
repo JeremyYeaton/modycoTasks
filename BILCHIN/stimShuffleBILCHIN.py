@@ -25,10 +25,10 @@ g = csv.reader(f,delimiter = '\t')
 # h = open('SWOPstims/stimTextFiles/practiceBlock.txt','w')
 h = open('stim\\practice.txt','w')
 for line in g:
-    if line[-1] == '0': # Condition column: 0 = notLinked ; 1  = linked
-        line[-1] = responses[0]
-    elif line[-1] == '1':
-        line[-1] = responses[1]
+    #if line[-1] == '0': # Condition column: 0 = notLinked ; 1  = linked
+    #    line[-1] = responses[0]
+    #elif line[-1] == '1':
+    #    line[-1] = responses[1]
     txtLine = '\t'.join(line)
     h.write(txtLine)
     h.write('\n')
