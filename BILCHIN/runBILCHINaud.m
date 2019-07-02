@@ -68,8 +68,8 @@ waitForSpace(ioObj,address)
 %% Instructions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,48);
-DrawFormattedText(window1,['S''il y a un lien sÃ©mantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
-'S''il n''y a pas de lien sÃ©mantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
 'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
 Screen('Flip',window1);
 % Wait for subject to press spacebar
@@ -80,7 +80,7 @@ waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 load('stim\\practice.mat','stimuli')
 
-for Idx = 1:height(stimuli)
+for Idx = 1:1%height(stimuli)
     disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
@@ -343,7 +343,7 @@ for Idx = 1:height(stimuli)
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
         KbReleaseWait;
-        Screen('DrawText',window1,pauseText, (W/2-300), (H/2), textColor);
+        DrawFormattedText(window1,pauseText, 'center','center', textColor);s
         Screen('Flip',window1)
         % Wait for subject to press spacebar
         waitForSpace(ioObj,address)

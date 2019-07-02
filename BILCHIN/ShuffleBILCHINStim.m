@@ -40,5 +40,5 @@ for i = 1:height(stimuli)
         stimuli.correctResponse(i) = reps{2};
     end
 end
-save(['stim\\practice.mat'],'stimuli')
+save('stim\\practice.mat','stimuli')
 end

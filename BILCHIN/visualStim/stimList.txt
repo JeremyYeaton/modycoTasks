@@ -122,7 +122,7 @@ Weight	Nested	Procedure	prime	target	condition	conditionDetail	correctResponse
 1		ExpProc	abeille	budget	4	spoA	0
 1		ExpProc	accident	parfum	4	spoB	0
 1		ExpProc	agenda	chauffage	4	spoA	0
-1		ExpProc	alerte	chaussette 	4	spoB	0
+1		ExpProc	alerte	chaussette	4	spoB	0
 1		ExpProc	ami	chapeau	4	spoB	0
 1		ExpProc	auteur	ceinture	4	spoB	0
 1		ExpProc	biologie	pastèque	4	spoA	0
