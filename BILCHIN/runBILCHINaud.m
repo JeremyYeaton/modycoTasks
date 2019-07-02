@@ -207,6 +207,7 @@ for Idx = 1:height(stimuli)
         end
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
+    PsychPortAudio(‘DeleteBuffer’);
     io64(ioObj,address,0);
 end
 
@@ -353,6 +354,7 @@ for Idx = 1:height(stimuli)
         end
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
+    PsychPortAudio(‘DeleteBuffer’);
     io64(ioObj,address,0);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
