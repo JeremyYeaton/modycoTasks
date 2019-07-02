@@ -23,7 +23,7 @@ else: # ex. sujet 2,sujet 3
 f = open('visualStim\\practice.txt','r')
 g = csv.reader(f,delimiter = '\t')
 # h = open('SWOPstims/stimTextFiles/practiceBlock.txt','w')
-h = open('visualStim\\practice.txt','w')
+h = open('stim\\practice.txt','w')
 for line in g:
     if line[-1] == '0': # Condition column: 0 = notLinked ; 1  = linked
         line[-1] = responses[0]

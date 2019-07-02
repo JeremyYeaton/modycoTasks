@@ -123,8 +123,9 @@ for Idx = 1:height(stimuli)
         wavedata = [wavedata ; wavedata];
         nrchannels = 2;
     end
-    % Initialize audio player
-    pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
+%     % Initialize audio player
+%     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
+    PsychPortAudio('DeleteBuffer');
     % Fill the audio playback buffer with the audio data 'wavedata':
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
@@ -208,6 +209,7 @@ for Idx = 1:height(stimuli)
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
     PsychPortAudio('DeleteBuffer');
+    PsychPortAudio('Close', pahandle);
     io64(ioObj,address,0);
 end
 
@@ -355,6 +357,7 @@ for Idx = 1:height(stimuli)
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
     PsychPortAudio('DeleteBuffer');
+    PsychPortAudio('Close', pahandle);
     io64(ioObj,address,0);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -362,7 +365,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 RestrictKeysForKbCheck([]);
 fclose(outputfile);
-PsychPortAudio('Close', pahandle);
 Screen(window1,'Close');
 close all
 clear io64;
