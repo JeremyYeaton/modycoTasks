@@ -74,7 +74,7 @@ waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,76); % Make the font big
 load('stim\\practice.mat','stimuli')
-for Idx = 1:6
+for Idx = 1:height(stimuli)
     disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
     % Wait until user releases keys on keyboard:
     KbReleaseWait;

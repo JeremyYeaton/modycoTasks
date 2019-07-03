@@ -111,6 +111,7 @@ for Idx = 1:height(stimuli)
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
     % Stop playback:
+    PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Stop', pahandle);
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -125,8 +126,9 @@ for Idx = 1:height(stimuli)
     end
 %     % Initialize audio player
 %     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
-    PsychPortAudio('DeleteBuffer');
+    
     % Fill the audio playback buffer with the audio data 'wavedata':
+%     PsychPortAudio('FillBuffer', pahandle, wavedata);
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
     drawCross(window1,W,H);
@@ -149,7 +151,7 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    PsychPortAudio('DeleteBuffer',pahandle);
+    PsychPortAudio('DeleteBuffer');
     % Response
     % Get keypress response
     while GetSecs - startTime < trialTimeout
@@ -196,7 +198,7 @@ for Idx = 1:height(stimuli)
         WaitSecs(timeBetweenTrials);
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
-    PsychPortAudio('DeleteBuffer',pahandle);
+    PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Close', pahandle);
     io64(ioObj,address,0);
 end
@@ -244,7 +246,7 @@ for Idx = 1:height(stimuli)
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    PsychPortAudio('DeleteBuffer',pahandle);
+    PsychPortAudio('DeleteBuffer');
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
@@ -257,7 +259,7 @@ for Idx = 1:height(stimuli)
         nrchannels = 2;
     end
     % Initialize audio player
-    pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
+%     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
     % Fill the audio playback buffer with the audio data 'wavedata':
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
@@ -282,8 +284,9 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    PsychPortAudio('DeleteBuffer',pahandle);
+    PsychPortAudio('DeleteBuffer');
     % Get keypress response
+    ACC = 0;
     while GetSecs - startTime < trialTimeout
         % Uncomment if statements
         %if isempty(find(keyCode, 1))
