@@ -80,7 +80,7 @@ waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 load('stim\\practice.mat','stimuli')
 
-for Idx = 1:6
+for Idx = 1:height(stimuli)
     disp(['Trial ',num2str(Idx),': ',stimuli.prime{Idx},'-',stimuli.target{Idx},' (',num2str(stimuli.condition(Idx)),')'])
     % Wait until user releases keys on keyboard:
     KbReleaseWait;
@@ -191,21 +191,11 @@ for Idx = 1:6
 
     % Save results to file
     fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
-        num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, rt);
-    % Determine whether to take a break
-    if mod(Idx,breakAfterTrials) == 0
-        KbReleaseWait;
-        Screen('DrawText',window1,pauseText, (W/2-300), (H/2), textColor);
-        Screen('Flip',window1)
-        % Wait for subject to press spacebar
+    % Pause between trials
+    if timeBetweenTrials == 0
         waitForSpace(ioObj,address)
     else
-    % Pause between trials
-        if timeBetweenTrials == 0
-            waitForSpace(ioObj,address)
-        else
-            WaitSecs(timeBetweenTrials);
-        end
+        WaitSecs(timeBetweenTrials);
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
     PsychPortAudio('DeleteBuffer');
