@@ -1,9 +1,7 @@
 Weight	Nested	Procedure	prime	target	condition	conditionDetail	correctResponse
 1		ExpProc	livre	cahier	1	Spo	1
-1		ExpProc	cousin	tante	1	Spo	1
 1		ExpProc	mère	père	1	Spo	1
 1		ExpProc	table	chaise	1	Spo	1
-1		ExpProc	fille	semaine	4	spo	0
-1		ExpProc	porte	kiwi	4	spo	0
+1		ExpProc	bouteille	semaine	4	spo	0
 1		ExpProc	feuille	chambre	4	spo	0
-1		ExpProc	bouteille	écouteur	4	spo	0
+1		ExpProc	tante	écouteur	4	spo	0

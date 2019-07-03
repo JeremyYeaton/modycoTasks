@@ -268,7 +268,7 @@ for Idx = 1:height(stimuli)
     % Determine whether to take a break
     if mod(Idx,breakAfterTrials) == 0
         KbReleaseWait;
-        Screen('DrawText',window1,pauseText, (W/2-300), (H/2), textColor);
+        DrawFormattedText(window1,pauseText, 'center','center', textColor);
         Screen('Flip',window1)
         % Wait for subject to press spacebar
         waitForSpace(ioObj,address)
