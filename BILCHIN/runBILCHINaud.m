@@ -90,7 +90,7 @@ for Idx = 1:height(stimuli)
     % Present prime 1000 ms
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
-    wavfilename = [expDir,'\\wav\\',stimuli.prime{Idx},'.wav'];
+    wavfilename = [expDir,'\\stim\\wav\\',stimuli.prime{Idx},'.wav'];
     [y, freq] = psychwavread(wavfilename);
     wavedata = y';
     nrchannels = size(wavedata,1); % Number of rows == number of channels.
@@ -116,7 +116,7 @@ for Idx = 1:height(stimuli)
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
-    wavfilename = [expDir,'\\wav\\',stimuli.target{Idx},'.wav'];
+    wavfilename = [expDir,'\\stim\\wav\\',stimuli.target{Idx},'.wav'];
     [y, freq] = psychwavread(wavfilename);
     wavedata = y';
     nrchannels = size(wavedata,1); % Number of rows == number of channels.
@@ -124,11 +124,7 @@ for Idx = 1:height(stimuli)
         wavedata = [wavedata ; wavedata];
         nrchannels = 2;
     end
-%     % Initialize audio player
-%     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
-    
     % Fill the audio playback buffer with the audio data 'wavedata':
-%     PsychPortAudio('FillBuffer', pahandle, wavedata);
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
     drawCross(window1,W,H);
@@ -169,23 +165,26 @@ for Idx = 1:height(stimuli)
         end
 
         % Check for response keys
+        ACC = 0;
         if ~isempty(pressedKeys)
             for i = 1:length(responseKeys)
                 if KbName(responseKeys{i}) == pressedKeys(1)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
-                    if strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx))
-                        repSignal = 200;
-                    else
-                        repSignal = 1;
-                    end
-                    io64(ioObj,address,repSignal);
+                    ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
                 end
             end
-            % Blank screen
+             % Blank screen
             Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
+        if ACC
+            repSignal = 200;
+        else
+            repSignal = 1;
+        end
+        io64(ioObj,address,repSignal);
+       
         % Exit loop once a response is recorded
         if rt > 0
             break;
@@ -197,7 +196,7 @@ for Idx = 1:height(stimuli)
     else
         WaitSecs(timeBetweenTrials);
     end
-%     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
+    pauseCheck(pauseText,window1,textColor,ioObj,address)
     PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Close', pahandle);
     io64(ioObj,address,0);
@@ -224,7 +223,7 @@ for Idx = 1:height(stimuli)
     % Present prime 1000 ms
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
-    wavfilename = [expDir,'\\wav\\',stimuli.prime{Idx},'.wav'];
+    wavfilename = [expDir,'\\stim\\wav\\',stimuli.prime{Idx},'.wav'];
     [y, freq] = psychwavread(wavfilename);
     wavedata = y';
     nrchannels = size(wavedata,1); % Number of rows == number of channels.
@@ -250,7 +249,7 @@ for Idx = 1:height(stimuli)
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
-    wavfilename = [expDir,'\\wav\\',stimuli.target{Idx},'.wav'];
+    wavfilename = [expDir,'\\stim\\wav\\',stimuli.target{Idx},'.wav'];
     [y, freq] = psychwavread(wavfilename);
     wavedata = y';
     nrchannels = size(wavedata,1); % Number of rows == number of channels.
@@ -258,8 +257,6 @@ for Idx = 1:height(stimuli)
         wavedata = [wavedata ; wavedata];
         nrchannels = 2;
     end
-    % Initialize audio player
-%     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
     % Fill the audio playback buffer with the audio data 'wavedata':
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
@@ -304,25 +301,25 @@ for Idx = 1:height(stimuli)
             return;
         end
 
-        % Check for response keys
+        % Check for response keys/ assess accuracy (ACC)
         if ~isempty(pressedKeys)
             for i = 1:length(responseKeys)
                 if KbName(responseKeys{i}) == pressedKeys(1)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
                     ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
-                    if ACC
-                        repSignal = 200;
-                    else
-                        repSignal = 1;
-                    end
-                    io64(ioObj,address,repSignal);
                 end
             end
-            % Blank screen
+             % Blank screen
             Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
+        if ACC
+            repSignal = 200;
+        else
+            repSignal = 1;
+        end
+        io64(ioObj,address,repSignal);
         % Exit loop once a response is recorded
         if rt > 0
             break;

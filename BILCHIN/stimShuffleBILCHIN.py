@@ -20,7 +20,7 @@ if subNum % 2 == 0:  # ex. sujet 1,sujet 4
 else: # ex. sujet 2,sujet 3
 	responses = ['j','f'] # notlinked, linked
 # Open practice stim file
-f = open('visualStim\\practice.txt','r')
+f = open('stim\\practiceMaster.txt','r')
 g = csv.reader(f,delimiter = '\t')
 # h = open('SWOPstims/stimTextFiles/practiceBlock.txt','w')
 h = open('stim\\practice.txt','w')
@@ -36,7 +36,7 @@ for line in g:
 f.close()
 h.close()
 # Open stim file
-f = open(''.join(['visualStim\\stimList.txt']),'r')
+f = open(''.join(['stim\\stimMaster.txt']),'r')
 g = csv.reader(f,delimiter = '\t')
 # Assign correct reponses to items
 allItems = []
