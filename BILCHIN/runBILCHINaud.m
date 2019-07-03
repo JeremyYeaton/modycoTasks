@@ -68,8 +68,8 @@ waitForSpace(ioObj,address)
 %% Instructions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,48);
-DrawFormattedText(window1,['S''il y a un lien sÃ©mantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
-'S''il n''y a pas de lien sÃ©mantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
 'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
 Screen('Flip',window1);
 % Wait for subject to press spacebar
@@ -149,6 +149,7 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
+    PsychPortAudio('DeleteBuffer',pahandle);
     % Response
     % Get keypress response
     while GetSecs - startTime < trialTimeout
@@ -188,9 +189,6 @@ for Idx = 1:height(stimuli)
             break;
         end
     end
-
-    % Save results to file
-    fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\n',...
     % Pause between trials
     if timeBetweenTrials == 0
         waitForSpace(ioObj,address)
@@ -198,7 +196,7 @@ for Idx = 1:height(stimuli)
         WaitSecs(timeBetweenTrials);
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
-    PsychPortAudio('DeleteBuffer');
+    PsychPortAudio('DeleteBuffer',pahandle);
     PsychPortAudio('Close', pahandle);
     io64(ioObj,address,0);
 end
@@ -246,6 +244,7 @@ for Idx = 1:height(stimuli)
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
+    PsychPortAudio('DeleteBuffer',pahandle);
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
@@ -283,7 +282,7 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-
+    PsychPortAudio('DeleteBuffer',pahandle);
     % Get keypress response
     while GetSecs - startTime < trialTimeout
         % Uncomment if statements
@@ -346,7 +345,6 @@ for Idx = 1:height(stimuli)
         end
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
-    PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Close', pahandle);
     io64(ioObj,address,0);
 end
