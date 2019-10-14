@@ -182,9 +182,9 @@ for Idx = 1:height(stimuli)
             Screen('Flip', window1);
         end
         if ACC
-            repSignal = 200;
+            repSignal = correct;
         else
-            repSignal = 1;
+            repSignal = incorrect;
         end
         io64(ioObj,address,repSignal);
        
@@ -318,9 +318,9 @@ for Idx = 1:height(stimuli)
             Screen('Flip', window1);
         end
         if ACC
-            repSignal = 200;
+            repSignal = correct;
         else
-            repSignal = 1;
+            repSignal = incorrect;
         end
         io64(ioObj,address,repSignal);
         % Exit loop once a response is recorded
