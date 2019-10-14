@@ -140,9 +140,9 @@ for Idx = 1:height(stimuli)
                     rt = respTime - startTime;
                     ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
                     if ACC
-                        repSignal = 200;
+                        repSignal = correct;
                     else
-                        repSignal = 1;
+                        repSignal = incorrect;
                     end
                     io64(ioObj,address,repSignal);
                 end
@@ -249,9 +249,9 @@ for Idx = 1:height(stimuli)
                     rt = respTime - startTime;
                     ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
                     if ACC
-                        repSignal = 200;
+                        repSignal = correct;
                     else
-                        repSignal = 1;
+                        repSignal = incorrect;
                     end
                     io64(ioObj,address,repSignal);
                 end
