@@ -53,6 +53,11 @@ resultsFolder = 'results';
 outputfile = fopen([resultsFolder '\resultfile_' num2str(subID) '.txt'],'a');
 fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t ACC \t RT\n');
 
+% Trigger constant for auditory modality
+modVal = 100;
+primeVal = 0;
+trgtVal = 5;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,7 +111,7 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1,tFixation + fixationDuration(Idx,1) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Begin audio
-    io64(ioObj,address,stimuli.condition(Idx)*5) % Send trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % Send trigger
     % Blank screen
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
@@ -130,7 +135,7 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Start audio
-    io64(ioObj,address,stimuli.condition(Idx)*10) % Send trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal)) % Send trigger
     rt = 0;
     resp = 0;
     %%%% WORK ON THIS PART -- break on keypress/ don't show question mark%%%%
@@ -239,7 +244,7 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1,tFixation + fixationDuration(Idx,1) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Begin audio
-    io64(ioObj,address,stimuli.condition(Idx)*5) % Send trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % Send trigger
     % Blank screen
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
@@ -263,7 +268,7 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Start audio
-    io64(ioObj,address,stimuli.condition(Idx)*10) % Send trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal)) % Send trigger
     rt = 0;
     resp = 0;
     %%%% WORK ON THIS PART -- break on keypress/ don't show question mark%%%%
