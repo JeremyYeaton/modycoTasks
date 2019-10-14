@@ -55,8 +55,6 @@ fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t ACC \t RT\n');
 
 % Trigger constant for auditory modality
 modVal = 100;
-primeVal = 0;
-trgtVal = 5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
