@@ -51,7 +51,7 @@ fixationDuration = .5 + (.75-.5).*rand(height(stimuli),2);
 % Set up the output file
 resultsFolder = 'results';
 outputfile = fopen([resultsFolder '\resultfile_' num2str(subID) '.txt'],'a');
-fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t RT\n');
+fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t ACC \t RT\n');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
@@ -68,8 +68,8 @@ waitForSpace(ioObj,address)
 %% Instructions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,48);
-DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
-'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+DrawFormattedText(window1,['S''il y a un lien sÃ©mantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sÃ©mantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
 'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
 Screen('Flip',window1);
 % Wait for subject to press spacebar
