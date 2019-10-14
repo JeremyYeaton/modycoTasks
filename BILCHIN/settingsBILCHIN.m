@@ -39,4 +39,7 @@ io64(ioObj,address,0); % set signal to 0
 primeVal = 0;
 trgtVal = 5;
 
+correct = 55;
+incorrect = 10;
+
 pauseText = 'Pause. Appuyez sur ESPACE pour continuer.';
