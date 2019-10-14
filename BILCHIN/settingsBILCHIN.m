@@ -36,4 +36,7 @@ status = io64(ioObj)
 address = hex2dec('4FD8'); 
 io64(ioObj,address,0); % set signal to 0
 
+primeVal = 0;
+trgtVal = 5;
+
 pauseText = 'Pause. Appuyez sur ESPACE pour continuer.';
