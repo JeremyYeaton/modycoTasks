@@ -49,6 +49,11 @@ resultsFolder = 'results';
 outputfile = fopen([resultsFolder '\resultfile_' num2str(subID) '.txt'],'a');
 fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t Acc\t RT\n');
 
+% Trigger constant for visual modality
+modVal = 200;
+primeVal = 0;
+trgtVal = 5;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,8 +67,8 @@ waitForSpace(ioObj,address)
 %% Instructions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Screen('TextSize', window1,48);
-DrawFormattedText(window1,['S''il y a un lien sémantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
-'S''il n''y a pas de lien sémantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
+DrawFormattedText(window1,['S''il y a un lien sÃ©mantique entre les deux mots, appuyez sur "',reps{2},'".\n\n',...
+'S''il n''y a pas de lien sÃ©mantique entre les deux mots, appuyez sur "',reps{1},'".\n\n\n',...
 'Appuyez sur la barre ESPACE pour essayer.'], 'center','center', textColor);
 Screen('Flip',window1);
 % Wait for subject to press spacebar
@@ -89,7 +94,7 @@ for Idx = 1:height(stimuli)
     % Present prime 500
     DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
     word = Screen('Flip', window1,tBlank + .2 - slack);
-    io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % UPDATE
     % Blank 600(ish)
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1,word + fixationDuration(Idx,2) - slack,0);
@@ -97,7 +102,7 @@ for Idx = 1:height(stimuli)
     % Target 500
     DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
-    io64(ioObj,address,stimuli.condition(Idx)*10) % UPDATE
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal)) % UPDATE
     rt = 0;
     resp = 0;
     while ~KbCheck && (GetSecs - startTime) < stimDurationVis
@@ -202,7 +207,7 @@ for Idx = 1:height(stimuli)
     % Present prime 500
     DrawFormattedText(window1,stimuli.prime{Idx}, 'center','center', textColor);
     word = Screen('Flip', window1,tBlank + .2 - slack);
-    io64(ioObj,address,stimuli.condition(Idx)*5) % UPDATE
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % UPDATE
     % Blank 600(ish)
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1,word + fixationDuration(Idx,2) - slack,0);
@@ -210,7 +215,7 @@ for Idx = 1:height(stimuli)
     % Target 500
     DrawFormattedText(window1,stimuli.target{Idx}, 'center','center', textColor);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
-    io64(ioObj,address,stimuli.condition(Idx)*10) % UPDATE
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal)) % UPDATE
     rt = 0;
     resp = 0;
     while ~KbCheck && (GetSecs - startTime) < stimDurationVis
