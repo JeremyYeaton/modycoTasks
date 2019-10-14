@@ -51,8 +51,6 @@ fprintf(outputfile, 'subID\t trial\t prime\t target\t response\t Acc\t RT\n');
 
 % Trigger constant for visual modality
 modVal = 200;
-primeVal = 0;
-trgtVal = 5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run experiment
