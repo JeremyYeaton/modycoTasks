@@ -269,7 +269,7 @@ for Idx = 1:height(stimuli)
     fprintf(outputfile, '%s\t %d\t %s\t %s\t %s\t %f\t %f\n',...
         num2str(subID), Idx, stimuli.prime{Idx}, stimuli.target{Idx}, resp, ACC, rt);
     % Determine whether to take a break
-    if mod(Idx,breakAfterTrials) == 0
+    if mod(Idx,breakAfterTrials) == 0 && Idx < height(stimuli)
         KbReleaseWait;
         DrawFormattedText(window1,pauseText, 'center','center', textColor);
         Screen('Flip',window1)
