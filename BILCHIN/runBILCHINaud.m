@@ -64,7 +64,6 @@ modVal = 100;
 DrawFormattedText(window1,'Appuyez sur ESPACE pour commencer.', 'center','center', textColor);
 % Screen('DrawText',window1,'Appuyez sur ESPACE pour commencer.', (W/2-200), (H/2), textColor);
 Screen('Flip',window1);
-Screen('TextSize', window1,76);
 % Wait for subject to press spacebar
 waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,6 +89,7 @@ for Idx = 1:height(stimuli)
     % Cross 500
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1);
+    io64(ioObj,address,0)
     % Present prime 1000 ms
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
@@ -109,7 +109,8 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     tFixation = Screen('Flip', window1,tFixation + fixationDuration(Idx,1) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Begin audio
-    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % Send trigger
+    % Send prime onset trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) 
     % Blank screen
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
@@ -134,13 +135,15 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Start audio
-    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal)) % Send trigger
+    % Send target onset trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal))
     rt = 0;
     resp = 0;
     %%%% WORK ON THIS PART -- break on keypress/ don't show question mark%%%%
     while ~KbCheck && GetSecs - startTime < stimDurationAud
         PsychPortAudio('GetStatus', pahandle);
     end
+    io64(ioObj,address,0)
     [~,~,keyCode] = KbCheck;
     if isempty(find(keyCode, 1))
         Screen('Flip', window1,startTime + stimDurationAud - slack,0);
@@ -150,12 +153,13 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    io64(ioObj,address,0)
     PsychPortAudio('DeleteBuffer');
-    % Response
+
     % Get keypress response
     while GetSecs - startTime < trialTimeout
-        [keyIsDown,secs,keyCode] = KbCheck;
+        if isempty(find(keyCode, 1))
+            [~,~,keyCode] = KbCheck;
+        end
         respTime = GetSecs;
         pressedKeys = find(keyCode);
 
@@ -169,41 +173,51 @@ for Idx = 1:height(stimuli)
         end
 
         % Check for response keys
-        ACC = 0;
         if ~isempty(pressedKeys)
             for i = 1:length(responseKeys)
                 if KbName(responseKeys{i}) == pressedKeys(1)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
                     ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
+                    if ACC
+                        repSignal = correct;
+                    else
+                        repSignal = incorrect;
+                    end
+                    io64(ioObj,address,repSignal);
                 end
             end
              % Blank screen
             Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
-        if ACC
-            repSignal = correct;
-        else
-            repSignal = incorrect;
-        end
-        io64(ioObj,address,repSignal);
        
         % Exit loop once a response is recorded
         if rt > 0
             break;
         end
     end
-    % Pause between trials
-    if timeBetweenTrials == 0
+    pauseCheck(pauseText,window1,textColor,ioObj,address)
+    % Determine whether to take a break
+    if mod(Idx,breakAfterTrials) == 0
+        KbReleaseWait;
+        Screen('DrawText',window1,pauseText, (W/2-300), (H/2), textColor);
+        Screen('Flip',window1)
+        % Wait for subject to press spacebar
         waitForSpace(ioObj,address)
     else
-        WaitSecs(timeBetweenTrials);
+    % Pause between trials
+        if timeBetweenTrials == 0
+            waitForSpace(ioObj,address)
+        else
+            
+            WaitSecs(timeBetweenTrials);
+        end
     end
-    pauseCheck(pauseText,window1,textColor,ioObj,address)
+    %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
+    io64(ioObj,address,0);
     PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Close', pahandle);
-    io64(ioObj,address,0);
 end
 
 %% Send off to the real task
@@ -225,6 +239,7 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     
     tFixation = Screen('Flip', window1);
+    io64(ioObj,address,0)
     % Present prime 1000 ms
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Read WAV file from filesystem:
@@ -242,10 +257,10 @@ for Idx = 1:height(stimuli)
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
     drawCross(window1,W,H);
-    io64(ioObj,address,0)
     tFixation = Screen('Flip', window1,tFixation + fixationDuration(Idx,1) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Begin audio
-    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % Send trigger
+    % Send prime onset trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) 
     % Blank screen
     Screen(window1, 'FillRect', backgroundColor);
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
@@ -270,7 +285,8 @@ for Idx = 1:height(stimuli)
     drawCross(window1,W,H);
     startTime = Screen('Flip', window1,tBlank + fixationDuration(Idx,2) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Start audio
-    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal)) % Send trigger
+    % Send target onset trigger
+    io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + trgtVal))
     rt = 0;
     resp = 0;
     %%%% WORK ON THIS PART -- break on keypress/ don't show question mark%%%%
@@ -288,15 +304,12 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
-    io64(ioObj,address,0)
     PsychPortAudio('DeleteBuffer');
     % Get keypress response
-    ACC = 0;
     while GetSecs - startTime < trialTimeout
-        % Uncomment if statements
-        %if isempty(find(keyCode, 1))
+        if isempty(find(keyCode, 1))
             [~,~,keyCode] = KbCheck;
-        %end
+        end
         respTime = GetSecs;
         pressedKeys = find(keyCode);
 
@@ -316,18 +329,19 @@ for Idx = 1:height(stimuli)
                     resp = responseKeys{i};
                     rt = respTime - startTime;
                     ACC = strcmp(KbName(pressedKeys(1)),stimuli.correctResponse(Idx));
+                    if ACC
+                        repSignal = correct;
+                    else
+                        repSignal = incorrect;
+                    end
+                    io64(ioObj,address,repSignal);
                 end
             end
              % Blank screen
             Screen(window1, 'FillRect', backgroundColor);
             Screen('Flip', window1);
         end
-        if ACC
-            repSignal = correct;
-        else
-            repSignal = incorrect;
-        end
-        io64(ioObj,address,repSignal);
+       
         % Exit loop once a response is recorded
         if rt > 0
             break;
@@ -353,8 +367,8 @@ for Idx = 1:height(stimuli)
         end
     end
 %     pauseCheck(pauseText,window1,W,H,textColor,trigLenS,ioObj,address)
+    PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Close', pahandle);
-    io64(ioObj,address,0);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End the experiment (don't change anything in this section)
