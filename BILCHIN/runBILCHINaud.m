@@ -115,6 +115,7 @@ for Idx = 1:height(stimuli)
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
     % Stop playback:
     PsychPortAudio('DeleteBuffer');
+    io64(ioObj,address,0)
     PsychPortAudio('Stop', pahandle);
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,7 +141,6 @@ for Idx = 1:height(stimuli)
     while ~KbCheck && GetSecs - startTime < stimDurationAud
         PsychPortAudio('GetStatus', pahandle);
     end
-    io64(ioObj,address,0)
     [~,~,keyCode] = KbCheck;
     if isempty(find(keyCode, 1))
         Screen('Flip', window1,startTime + stimDurationAud - slack,0);
@@ -150,6 +150,7 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
+    io64(ioObj,address,0)
     PsychPortAudio('DeleteBuffer');
     % Response
     % Get keypress response
@@ -222,6 +223,7 @@ for Idx = 1:height(stimuli)
     KbReleaseWait;
     % Cross 500
     drawCross(window1,W,H);
+    
     tFixation = Screen('Flip', window1);
     % Present prime 1000 ms
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,6 +242,7 @@ for Idx = 1:height(stimuli)
     PsychPortAudio('FillBuffer', pahandle, wavedata);
     % Display fixation cross for ~500 ms
     drawCross(window1,W,H);
+    io64(ioObj,address,0)
     tFixation = Screen('Flip', window1,tFixation + fixationDuration(Idx,1) - slack,0);
     PsychPortAudio('Start', pahandle, repetitions, 0, 1); % Begin audio
     io64(ioObj,address,(modVal + stimuli.condition(Idx)*10 + primeVal)) % Send trigger
@@ -248,6 +251,7 @@ for Idx = 1:height(stimuli)
     tBlank = Screen('Flip', window1, tFixation + stimDurationAud - slack,0);
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
+    io64(ioObj,address,0)
     PsychPortAudio('DeleteBuffer');
     % Target
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -284,6 +288,7 @@ for Idx = 1:height(stimuli)
     end
     % Stop playback:
     PsychPortAudio('Stop', pahandle);
+    io64(ioObj,address,0)
     PsychPortAudio('DeleteBuffer');
     % Get keypress response
     ACC = 0;
