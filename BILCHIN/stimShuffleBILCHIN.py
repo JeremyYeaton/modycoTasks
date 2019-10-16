@@ -1,3 +1,8 @@
+# Script to shuffle auditory and visual stimuli
+# Experiment: Chinese bilingual word processing (BILCHIN)
+# (c) Jeremy D. Yeaton
+# Created April 2019
+
 import os, csv, random, sys
 
 # os.chdir('/Users/yaruwu/MEGA/_PojetEEG/1_Stimuli')
