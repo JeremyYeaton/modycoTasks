@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Modified Navon visual task
-Author: Jeremy Yeaton
+Author: Jeremy D. Yeaton (c)
 24 March 2019
 '''
 
