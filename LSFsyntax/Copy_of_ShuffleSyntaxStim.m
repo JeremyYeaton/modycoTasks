@@ -1,3 +1,6 @@
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 % function ShuffleSyntaxStim(subID)
 stim = readtable('stim\stimLSFsyntax.txt','Delimiter','\t');
 
