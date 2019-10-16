@@ -1,3 +1,7 @@
+% Practice trials for LSF PhonSem task
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 function runLSFphonsemPrac
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
