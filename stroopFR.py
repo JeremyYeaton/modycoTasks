@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Stroop task in French (adaptable for other languages)
-Author: Jeremy Yeaton
+Author: Jeremy Yeaton (c)
 24 March 2019
 '''
 
