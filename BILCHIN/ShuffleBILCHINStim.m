@@ -1,3 +1,7 @@
+% Shuffle BILCHIN stimuli (relies on python script)
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 function ShuffleBILCHINStim(subID,modality,reps)
 % stimuli = readtable('stim\rawStimBILCHINtest.txt','Delimiter','\t');
 system(['python stimShuffleBILCHIN.py ',num2str(subID)]);
