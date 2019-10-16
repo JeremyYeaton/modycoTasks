@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+'''
+Simon task
+Author: Jeremy Yeaton (c)
+February 2018
+'''
 import expyriment as xpy
 
 # xpy.control.set_develop_mode(True)
