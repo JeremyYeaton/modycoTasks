@@ -1,3 +1,7 @@
+% LSF PhonSem task
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 function ShufflePhonSemStim(subID)
 stim = readtable('stim\stimLSFphonsem.txt','Delimiter','\t');
 
