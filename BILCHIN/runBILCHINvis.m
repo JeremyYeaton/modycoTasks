@@ -1,3 +1,7 @@
+% BILCHIN visual presentation task
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 function runBILCHINvis(subID)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
