@@ -1,3 +1,7 @@
+% LSF Syntax task practice trials
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 function runLSFsyntPrac
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
