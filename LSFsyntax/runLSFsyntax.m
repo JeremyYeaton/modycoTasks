@@ -1,3 +1,7 @@
+% LSF Syntax task
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 function runLSFsyntax(subID)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Set up the experiment (don't modify this section)
