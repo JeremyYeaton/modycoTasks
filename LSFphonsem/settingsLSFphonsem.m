@@ -1,4 +1,7 @@
-%% Settings for change blindness experiment
+%% Settings for LSF PhonSem task
+% (c) Jeremy D. Yeaton
+% Created April 2019
+
 % Change these to suit your experiment!
 
 % Navigate to appropriate directory
