@@ -1,4 +1,4 @@
-% LSF PhonSem task
+% Shuffle stimuli for LSF PhonSem task
 % (c) Jeremy D. Yeaton
 % Created April 2019
 
