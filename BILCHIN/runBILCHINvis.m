@@ -291,8 +291,9 @@ for Idx = 1:height(stimuli)
     io64(ioObj,address,0);
 end
 
-DrawFormattedText(window,'Merci pour votre participation!','center','center',textColor);
-Screen('Flip',window)
+% Thank you and goodbye screen
+DrawFormattedText(window1,'Merci pour votre participation!','center','center',textColor);
+Screen('Flip',window1)
 waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End the experiment (don't change anything in this section)
