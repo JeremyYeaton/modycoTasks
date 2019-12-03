@@ -374,6 +374,10 @@ for Idx = 1:height(stimuli)
     PsychPortAudio('DeleteBuffer');
     PsychPortAudio('Close', pahandle);
 end
+
+DrawFormattedText(window,'Merci pour votre participation!','center','center',textColor);
+Screen('Flip',window)
+waitForSpace(ioObj,address)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End the experiment (don't change anything in this section)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
