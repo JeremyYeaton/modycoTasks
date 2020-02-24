@@ -17,7 +17,7 @@ subNum = int(sys.argv[1])
 nLists = 3
 maxRep = 3 # Maximum number of the same response allowed in a row
 
-# #### CHOOSE FROM DIFFERNT CONDITIONS
+# #### CHOOSE FROM DIFFERENT CONDITIONS
 
 # Assign response category to alternate every 2 participants
 if subNum % 2 == 0:  # ex. sujet 1,sujet 4
